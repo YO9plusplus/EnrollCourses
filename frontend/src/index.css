@@ -1,0 +1,13 @@
+@import "tailwindcss";
+:root {
+  --thai-green: #2d6e5e;
+}
+
+@font-face {
+  font-family: 'SaoChingcha';
+  src: url('./assets/fonts/SaoChingcha-Regular.otf') format('truetype');
+}
+
+* {
+  font-family: 'SaoChingcha', sans-serif;
+}
