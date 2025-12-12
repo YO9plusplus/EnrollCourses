@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import CourseDetailCard from "../components/CourseDetailCard";
 import { formConfigs } from "../config/formConfigs";
@@ -19,6 +20,8 @@ import logo_yuwa from '../assets/logoยุว.gif'
 
 const DetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
   const config = formConfigs[id];
     const courses = [{
@@ -42,12 +45,30 @@ const DetailPage = () => {
     const initialData = {};
     Object.keys(config.fields).forEach(fieldName => {
       const field = config.fields[fieldName];
-      initialData[fieldName] = field.type === 'checkbox' ? false : '';
+
+      // Pre-fill with user data if available
+      if (user && user[fieldName]) {
+        initialData[fieldName] = user[fieldName];
+      } else {
+        initialData[fieldName] = field.type === 'checkbox' ? false : '';
+      }
     });
     return initialData;
-  }
+  };
 
   const [formData, setFormData] = useState(initializeFormData());
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setFormData(initializeFormData());
+    }
+  }, [user, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: `/detail/${id}` } });
+    }
+  }, [isAuthenticated, navigate, id]);
 
     const handleChange = (e) => {
       const { name, value, type, checked } = e.target;

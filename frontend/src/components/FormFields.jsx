@@ -1,3 +1,7 @@
+// Work Info Fields
+import { useState, useEffect } from 'react';
+import { bangkokDistricts, bangkokSchools } from '../data/bangkokSchools';
+
 export const CourseSelectionField = ({ options, formData, handleChange }) => (
   <div className="bg-blue-50 p-4 rounded-lg">
     <label className="block text-gray-700 font-semibold mb-3">
@@ -91,15 +95,21 @@ export const PersonalInfoFields = ({ formData, handleChange, showAge = false }) 
         <label className="block text-gray-700 text-sm mb-2">
           ศาสนา <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
+        <select
           name="religion"
           value={formData.religion}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="เช่น พุทธ"
-        />
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--thai-green)"
+        >
+          <option value="">เลือกศาสนา</option>
+          <option value="พุทธ">พุทธ</option>
+          <option value="อิสลาม">อิสลาม</option>
+          <option value="คริสต์">คริสต์</option>
+          <option value="ฮินดู">ฮินดู</option>
+          <option value="ซิกข์">ซิกข์</option>
+          <option value="อื่นๆ">อื่นๆ</option>
+        </select>
       </div>
     </div>
 
@@ -164,32 +174,117 @@ export const EducationFields = ({ formData, handleChange }) => (
         <label className="block text-gray-700 text-sm mb-2">
           วุฒิการศึกษาสูงสุด <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
+        <select
           name="education"
           value={formData.education}
           onChange={handleChange}
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="เช่น ปริญญาตรี"
-        />
+        >
+          <option value="">เลือกวุฒิการศึกษา</option>
+          <option value="ต่ำกว่าปริญญาตรี">ต่ำกว่าปริญญาตรี</option>
+          <option value="ปริญญาตรี">ปริญญาตรี</option>
+          <option value="ปริญญาโท">ปริญญาโท</option>
+          <option value="ปริญญาเอก">ปริญญาเอก</option>
+        </select>
       </div>
       
       <div>
         <label className="block text-gray-700 text-sm mb-2">
           วิชาเอก <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
+        <select
           name="major"
           value={formData.major}
           onChange={handleChange}
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="เช่น การศึกษา"
-        />
+        >
+          <option value="">เลือกวิชาเอก</option>
+          
+          {/* ครุศาสตร์/การศึกษา */}
+          <optgroup label="ครุศาสตร์/การศึกษา">
+            <option value="การศึกษาปฐมวัย">การศึกษาปฐมวัย</option>
+            <option value="การประถมศึกษา">การประถมศึกษา</option>
+            <option value="หลักสูตรและการสอน">หลักสูตรและการสอน</option>
+            <option value="การบริหารการศึกษา">การบริหารการศึกษา</option>
+            <option value="จิตวิทยาการศึกษา">จิตวิทยาการศึกษา</option>
+            <option value="เทคโนโลยีการศึกษา">เทคโนโลยีการศึกษา</option>
+            <option value="การวัดและประเมินผล">การวัดและประเมินผล</option>
+          </optgroup>
+          
+          {/* ภาษา */}
+          <optgroup label="ภาษา">
+            <option value="ภาษาไทย">ภาษาไทย</option>
+            <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
+            <option value="ภาษาจีน">ภาษาจีน</option>
+            <option value="ภาษาญี่ปุ่น">ภาษาญี่ปุ่น</option>
+            <option value="ภาษาฝรั่งเศส">ภาษาฝรั่งเศส</option>
+            <option value="ภาษาอื่นๆ">ภาษาอื่นๆ</option>
+          </optgroup>
+          
+          {/* วิทยาศาสตร์ */}
+          <optgroup label="วิทยาศาสตร์">
+            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+            <option value="ฟิสิกส์">ฟิสิกส์</option>
+            <option value="เคมี">เคมี</option>
+            <option value="ชีววิทยา">ชีววิทยา</option>
+            <option value="วิทยาศาสตร์ทั่วไป">วิทยาศาสตร์ทั่วไป</option>
+            <option value="วิทยาการคอมพิวเตอร์">วิทยาการคอมพิวเตอร์</option>
+          </optgroup>
+          
+          {/* สังคมศาสตร์ */}
+          <optgroup label="สังคมศาสตร์">
+            <option value="สังคมศึกษา">สังคมศึกษา</option>
+            <option value="ประวัติศาสตร์">ประวัติศาสตร์</option>
+            <option value="ภูมิศาสตร์">ภูมิศาสตร์</option>
+            <option value="เศรษฐศาสตร์">เศรษฐศาสตร์</option>
+            <option value="รัฐศาสตร์">รัฐศาสตร์</option>
+            <option value="สังคมวิทยา">สังคมวิทยา</option>
+            <option value="จิตวิทยา">จิตวิทยา</option>
+          </optgroup>
+          
+          {/* ศิลปะ/ดนตรี/พละ */}
+          <optgroup label="ศิลปะและกีฬา">
+            <option value="ศิลปศึกษา">ศิลปศึกษา</option>
+            <option value="ดนตรีศึกษา">ดนตรีศึกษา</option>
+            <option value="นาฏศิลป์">นาฏศิลป์</option>
+            <option value="พลศึกษา">พลศึกษา</option>
+            <option value="สุขศึกษา">สุขศึกษา</option>
+          </optgroup>
+          
+          {/* อาชีวศึกษา */}
+          <optgroup label="อาชีวศึกษา">
+            <option value="คหกรรม">คหกรรม</option>
+            <option value="เกษตรกรรม">เกษตรกรรม</option>
+            <option value="อุตสาหกรรม">อุตสาหกรรม</option>
+            <option value="พาณิชยกรรม">พาณิชยกรรม</option>
+            <option value="เทคโนโลยีสารสนเทศ">เทคโนโลยีสารสนเทศ</option>
+          </optgroup>
+          
+          {/* อื่นๆ */}
+          <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
+        </select>
       </div>
     </div>
+    
+    {/* Show text input if "อื่นๆ" is selected for major */}
+    {formData.major === 'อื่นๆ' && (
+      <div className="mt-3">
+        <label className="block text-gray-700 text-sm mb-2">
+          โปรดระบุวิชาเอก <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="majorOther"
+          value={formData.majorOther || ''}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+          placeholder="ระบุวิชาเอก"
+        />
+      </div>
+    )}
   </div>
 );
 
@@ -234,73 +329,210 @@ export const ContactFields = ({ formData, handleChange }) => (
   </div>
 );
 
-// Work Info Fields
-export const WorkInfoFields = ({ formData, handleChange, phoneFieldName = 'officePhone' }) => (
-  <div className="border-t pt-4">
-    <h4 className="font-semibold text-lg text-gray-800 mb-4">ข้อมูลการทำงาน</h4>
+export const WorkInfoFields = ({ formData, handleChange, phoneFieldName = 'officePhone' }) => {
+  const [selectedDistrict, setSelectedDistrict] = useState(formData.district || '');
+  const [availableSchools, setAvailableSchools] = useState(
+    formData.district ? (bangkokSchools[formData.district] || []) : []
+  );
+
+  const academicLevels = {
+    'ครู': [
+      'ครูผู้ช่วย',
+      'ปฏิบัติการ',
+      'ชำนาญการ',
+      'ชำนาญการพิเศษ',
+      'เชี่ยวชาญ'
+    ],
+    'ผู้บริหาร': [
+      'ผู้บริหารสถานศึกษา',
+      'ชำนาญการ',
+      'ชำนาญการพิเศษ',
+      'เชี่ยวชาญ',
+      'เชี่ยวชาญพิเศษ'
+    ]
+  };
+  
+  useEffect(() => {
+    if (formData.district) {
+      setSelectedDistrict(formData.district);
+      setAvailableSchools(bangkokSchools[formData.district] || []);
+    }
+  }, [formData.district]);
+
+  const handleDistrictChange = (e) => {
+    const district = e.target.value;
+    setSelectedDistrict(district);
     
-    <div className="grid grid-cols-2 gap-3 mb-3">
-      <div>
-        <label className="block text-gray-700 text-sm mb-2">
-          ตำแหน่ง <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          name="position"
-          value={formData.position}
-          onChange={handleChange}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="เช่น ครู"
-        />
-      </div>
+    // Update available schools based on selected district
+    if (district) {
+      setAvailableSchools(bangkokSchools[district] || []);
+    } else {
+      setAvailableSchools([]);
+    }
+    
+    handleChange({
+      target: {
+        name: 'district',
+        value: district
+      }
+    });
+
+    handleChange({
+      target: {
+        name: 'school',
+        value: ''
+      }
+    });
+
+    handleChange({
+      target: {
+        name: phoneFieldName,
+        value: ''
+      }
+    });
+  };
+
+  const handlePositionChange = (e) => {
+    const position = e.target.value;
+    
+    // Update position
+    handleChange({
+      target: {
+        name: 'position',
+        value: position
+      }
+    });
+    
+    // Reset academic level when position changes
+    requestAnimationFrame(() => {
+      handleChange({
+        target: {
+          name: 'academicLevel',
+          value: ''
+        }
+      });
+    });
+  };
+
+  const handleSchoolChange = (e) => {
+    const schoolName = e.target.value;
+
+    
+    // Find the selected school to auto-fill phone
+    const school = availableSchools.find(s => s.name === schoolName);
+    
+    // Update school name
+    handleChange({
+      target: {
+        name: 'school',
+        value: schoolName
+      }
+    });
+    
+    // Auto-fill phone number
+    if (school) {
+      handleChange({
+        target: {
+          name: phoneFieldName,
+          value: school.phone
+        }
+      });
+    }
+  };
+
+  const availableAcademicLevels = formData.position ? (academicLevels[formData.position] || []) : [];
+
+  return (
+    <div className="border-t pt-4">
+      <h4 className="font-semibold text-lg text-gray-800 mb-4">ข้อมูลการทำงาน</h4>
       
-      <div>
-        <label className="block text-gray-700 text-sm mb-2">
-          วิทยฐานะ
-        </label>
-        <input
-          type="text"
-          name="academicLevel"
-          value={formData.academicLevel}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="เช่น ชำนาญการ"
-        />
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="block text-gray-700 text-sm mb-2">
+            ตำแหน่ง <span className="text-red-500">*</span>
+          </label>
+          <select
+            name="position"
+            value={formData.position || ''}
+            onChange={handlePositionChange}  // Changed from handleChange to handlePositionChange
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+          >
+            <option value="">เลือกตำแหน่ง</option>
+            <option value="ครู">ครู</option>
+            <option value="ผู้บริหาร">ผู้บริหาร</option>
+          </select>
+        </div>
+        
+        <div>
+          <label className="block text-gray-700 text-sm mb-2">
+            วิทยฐานะ
+          </label>
+          <select
+            name="academicLevel"
+            value={formData.academicLevel || ''}
+            onChange={handleChange}
+            disabled={!formData.position}  // Disabled until position is selected
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">
+              {formData.position ? 'เลือกวิทยฐานะ' : 'กรุณาเลือกตำแหน่งก่อน'}
+            </option>
+            {availableAcademicLevels.map((level, index) => (
+              <option key={index} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div className="mb-3">
-      <label className="block text-gray-700 text-sm mb-2">
-        โรงเรียน <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        name="school"
-        value={formData.school}
-        onChange={handleChange}
-        required
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-        placeholder="ชื่อโรงเรียน"
-      />
-    </div>
-
-    <div className="grid grid-cols-2 gap-3">
-      <div>
+      {/* District Dropdown - First */}
+      <div className="mb-3">
         <label className="block text-gray-700 text-sm mb-2">
           สังกัดสำนักงานเขต <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
+        <select
           name="district"
-          value={formData.district}
-          onChange={handleChange}
+          value={formData.district || ''}
+          onChange={handleDistrictChange}
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="เช่น เขตบางกอกใหญ่"
-        />
+        >
+          <option value="">เลือกเขต</option>
+          {bangkokDistricts.map(district => (
+            <option key={district} value={district}>
+              {district}
+            </option>
+          ))}
+        </select>
       </div>
-      
+
+      {/* School Dropdown - Appears after district is selected */}
+      <div className="mb-3">
+        <label className="block text-gray-700 text-sm mb-2">
+          โรงเรียน <span className="text-red-500">*</span>
+        </label>
+        <select
+          name="school"
+          value={formData.school || ''}
+          onChange={handleSchoolChange}
+          required
+          disabled={!selectedDistrict}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] disabled:bg-gray-100 disabled:cursor-not-allowed"
+        >
+          <option value="">
+            {selectedDistrict ? 'เลือกโรงเรียน' : 'กรุณาเลือกเขตก่อน'}
+          </option>
+          {availableSchools.map((school, index) => (
+            <option key={index} value={school.name}>
+              {school.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Phone - Auto-filled */}
       <div>
         <label className="block text-gray-700 text-sm mb-2">
           เบอร์โทรศัพท์{phoneFieldName === 'schoolPhone' ? 'โรงเรียน' : 'หน่วยงาน'}
@@ -308,15 +540,19 @@ export const WorkInfoFields = ({ formData, handleChange, phoneFieldName = 'offic
         <input
           type="tel"
           name={phoneFieldName}
-          value={formData[phoneFieldName]}
+          value={formData[phoneFieldName] || ''}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-          placeholder="0x-xxx-xxxx"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] bg-gray-50"
+          placeholder="เบอร์จะถูกกรอกอัตโนมัติเมื่อเลือกโรงเรียน"
+          readOnly
         />
+        <p className="text-xs text-gray-500 mt-1">
+          เบอร์โทรศัพท์จะถูกกรอกอัตโนมัติเมื่อเลือกโรงเรียน
+        </p>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Scout Previous Training Fields
 export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => (
