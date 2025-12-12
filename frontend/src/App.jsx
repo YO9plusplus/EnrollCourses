@@ -4,12 +4,10 @@ import DetailPage from './pages/DetailPage'
 
 function App() {
   return (
-      <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage/>} />
           <Route path="detail/:id" element={<DetailPage/>} />
         </Routes>
-      </BrowserRouter>
   )
 }
 
