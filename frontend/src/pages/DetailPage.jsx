@@ -6,17 +6,12 @@ import CourseDetailCard from "../components/CourseDetailCard";
 import { formConfigs } from "../config/formConfigs";
 import { 
   CourseSelectionField, 
-  PersonalInfoFields, 
-  EducationFields,
-  ContactFields,
-  WorkInfoFields,
   ScoutPreviousTrainingFields,
   RedCrossPreviousTrainingFields,
-  HealthFields,
   AgreementField
 } from "../components/FormFields";
-import logo_scout from '../assets/logoลูกเสือ.gif'
-import logo_yuwa from '../assets/logoยุว.gif'
+import logo_scout from '../assets/logoลูกเสือ.jpg'
+import logo_yuwa from '../assets/logoยุว.jpg'
 
 const DetailPage = () => {
   const { id } = useParams();
@@ -45,24 +40,12 @@ const DetailPage = () => {
     const initialData = {};
     Object.keys(config.fields).forEach(fieldName => {
       const field = config.fields[fieldName];
-
-      // Pre-fill with user data if available
-      if (user && user[fieldName]) {
-        initialData[fieldName] = user[fieldName];
-      } else {
-        initialData[fieldName] = field.type === 'checkbox' ? false : '';
-      }
-    });
+      initialData[fieldName] = field.type === 'checkbox' ? false : '';
+    })
     return initialData;
   };
 
   const [formData, setFormData] = useState(initializeFormData());
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setFormData(initializeFormData());
-    }
-  }, [user, isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -80,6 +63,21 @@ const DetailPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const submissionData = new FormData();
+
+        submissionData.append('userId', user.id);
+        submissionData.append('courseId', id);
+
+        Object.keys(formData).forEach(key => {
+          if (formData[key] instanceof File) {
+            submissionData.append(key, formData[key]);
+          } else if (typeof formData[key] === 'boolean') {
+            submissionData.append(key, formData[key].toString());
+          } else if (formData[key]) {
+            submissionData.append(key, formData[key]);
+          }
+        });
         console.log('Form submitted:', formData);
     };
 
@@ -101,6 +99,19 @@ const DetailPage = () => {
 
             {/* Right Side - Registration Form */}
             <div className="bg-white rounded-lg shadow-lg p-6">
+              
+              {/* User Info Display - READ ONLY */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-blue-900 mb-3">ข้อมูลของคุณ</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-600">ชื่อ:</span> <span className="font-medium">{user?.firstName} {user?.lastName}</span></div>
+                  <div><span className="text-gray-600">อีเมล:</span> <span className="font-medium">{user?.email}</span></div>
+                  <div><span className="text-gray-600">โทร:</span> <span className="font-medium">{user?.mobilePhone || '-'}</span></div>
+                  <div><span className="text-gray-600">โรงเรียน:</span> <span className="font-medium">{user?.school || '-'}</span></div>
+                </div>
+                <p className="text-xs text-blue-700 mt-2">💡 แก้ไขข้อมูลได้ที่หน้าโปรไฟล์</p>
+              </div>
+
               <h3 className="text-2xl font-bold text-gray-800 mb-6">
                 แบบฟอร์มลงทะเบียน
               </h3>
@@ -111,35 +122,7 @@ const DetailPage = () => {
                   options={config.courseOptions}
                   formData={formData}
                   handleChange={handleChange}
-                />
-
-                {/* Personal Info */}
-                <PersonalInfoFields 
-                  formData={formData}
-                  handleChange={handleChange}
-                  showAge={config.fields.age !== undefined}
-                />
-
-                {/* Contact Info */}
-                <ContactFields 
-                  formData={formData}
-                  handleChange={handleChange}
-                />
-
-                {/* Education (only for redcross) */}
-                {config.type === 'redcross' && (
-                  <EducationFields 
-                    formData={formData}
-                    handleChange={handleChange}
-                  />
-                )}
-
-                {/* Work Info */}
-                <WorkInfoFields 
-                  formData={formData}
-                  handleChange={handleChange}
-                  phoneFieldName={config.type === 'redcross' ? 'schoolPhone' : 'officePhone'}
-                />
+                />               
 
                 {/* Previous Training - Different for each type */}
                 {config.type === 'scout' && (
@@ -155,13 +138,6 @@ const DetailPage = () => {
                     handleChange={handleChange}
                   />
                 )}
-
-                {/* Health and Food */}
-                <HealthFields 
-                  formData={formData}
-                  handleChange={handleChange}
-                  showHealthCondition={config.type === 'scout'}
-                />
 
                 {/* Agreement */}
                 <AgreementField 

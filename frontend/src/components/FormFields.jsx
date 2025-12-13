@@ -555,177 +555,314 @@ export const WorkInfoFields = ({ formData, handleChange, phoneFieldName = 'offic
 };
 
 // Scout Previous Training Fields
-export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => (
-  <div className="border-t pt-4">
-    <h4 className="font-semibold text-lg text-gray-800 mb-4">ประสบการณ์การฝึกอบรม</h4>
+export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
+  const handleFileChange = (e) => {
+    const { name } = e.target;
+    const file = e.target.files[0];
     
-    <div className="mb-3">
-      <label className="flex items-center">
-        <input
-          type="checkbox"
-          name="hasBasicTraining"
-          checked={formData.hasBasicTraining}
-          onChange={handleChange}
-          className="mr-2"
-        />
-        <span className="text-gray-700">เคยผ่านการฝึกอบรมลูกเสือขั้นความรู้เบื้องต้น (B.T.C.)</span>
-      </label>
-    </div>
+    handleChange({
+      target: {
+        name: name,
+        value: file,
+        type: 'file'
+      }
+    });
+  };
 
-    {formData.hasBasicTraining && (
-      <>
+  return (
+    <>
+      {/* Previous Training Experience Section */}
+      <div className="border-t pt-4">
+        <h4 className="font-semibold text-lg text-gray-800 mb-4">ประสบการณ์การฝึกอบรม</h4>
+        
+        <div className="mb-3">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="hasBasicTraining"
+              checked={formData.hasBasicTraining}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <span className="text-gray-700">เคยผ่านการฝึกอบรมลูกเสือขั้นความรู้เบื้องต้น (B.T.C.)</span>
+          </label>
+        </div>
+
+        {formData.hasBasicTraining && (
+          <>
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                ประเภท
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="trainingType"
+                    value="สำรอง"
+                    checked={formData.trainingType === 'สำรอง'}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">สำรอง</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="trainingType"
+                    value="สามัญ"
+                    checked={formData.trainingType === 'สามัญ'}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">สามัญ</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="trainingType"
+                    value="สามัญรุ่นใหญ่"
+                    checked={formData.trainingType === 'สามัญรุ่นใหญ่'}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">สามัญรุ่นใหญ่</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                สถานที่ฝึกอบรม
+              </label>
+              <input
+                type="text"
+                name="trainingLocation"
+                value={formData.trainingLocation}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                placeholder="สถานที่ที่เคยฝึกอบรม"
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                ระหว่างวันที่
+              </label>
+              <input
+                type="text"
+                name="trainingDate"
+                value={formData.trainingDate}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                placeholder="เช่น 1-7 มกราคม 2568"
+              />
+            </div>
+
+            {/* File Upload - Training Evidence (inside hasBasicTraining condition) */}
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                หลักฐานการฝึกอบรม (PDF หรือรูปภาพ)
+              </label>
+              <input
+                type="file"
+                name="trainingEvidence"
+                onChange={handleFileChange}
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+              />
+              {formData.trainingEvidence && (
+                <p className="text-xs text-green-600 mt-1">
+                  ✓ ไฟล์: {formData.trainingEvidence.name}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                รองรับไฟล์: PDF, JPG, PNG (ขนาดไม่เกิน 5MB)
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Required Documents Section - OUTSIDE previous training */}
+      <div className="border-t pt-4 mt-6">
+        <h4 className="font-semibold text-lg text-gray-800 mb-4">เอกสารประกอบการสมัคร</h4>
+
+        {/* File Upload - Supervisor Consent */}
         <div className="mb-3">
           <label className="block text-gray-700 text-sm mb-2">
-            ประเภท
+            คำยินยอมให้รับการฝึกอบรมจากผู้บังคับบัญชา <span className="text-red-500">*</span>
           </label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="trainingType"
-                value="สำรอง"
-                checked={formData.trainingType === 'สำรอง'}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <span className="text-sm">สำรอง</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="trainingType"
-                value="สามัญ"
-                checked={formData.trainingType === 'สามัญ'}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <span className="text-sm">สามัญ</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="trainingType"
-                value="สามัญรุ่นใหญ่"
-                checked={formData.trainingType === 'สามัญรุ่นใหญ่'}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <span className="text-sm">สามัญรุ่นใหญ่</span>
-            </label>
-          </div>
+          <input
+            type="file"
+            name="supervisorConsent"
+            onChange={handleFileChange}
+            accept=".pdf,.jpg,.jpeg,.png"
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+          />
+          {formData.supervisorConsent && (
+            <p className="text-xs text-green-600 mt-1">
+              ✓ ไฟล์: {formData.supervisorConsent.name}
+            </p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            รองรับไฟล์: PDF, JPG, PNG (ขนาดไม่เกิน 5MB)
+          </p>
         </div>
 
+        {/* File Upload - Medical Certificate */}
         <div className="mb-3">
           <label className="block text-gray-700 text-sm mb-2">
-            สถานที่ฝึกอบรม
+            ใบรับรองแพทย์ <span className="text-red-500">*</span>
           </label>
           <input
-            type="text"
-            name="trainingLocation"
-            value={formData.trainingLocation}
-            onChange={handleChange}
+            type="file"
+            name="medicalCertificate"
+            onChange={handleFileChange}
+            accept=".pdf,.jpg,.jpeg,.png"
+            required
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="สถานที่ที่เคยฝึกอบรม"
           />
+          {formData.medicalCertificate && (
+            <p className="text-xs text-green-600 mt-1">
+              ✓ ไฟล์: {formData.medicalCertificate.name}
+            </p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            รองรับไฟล์: PDF, JPG, PNG (ขนาดไม่เกิน 5MB)
+          </p>
         </div>
-
-        <div>
-          <label className="block text-gray-700 text-sm mb-2">
-            ระหว่างวันที่
-          </label>
-          <input
-            type="text"
-            name="trainingDate"
-            value={formData.trainingDate}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="เช่น 1-7 มกราคม 2568"
-          />
-        </div>
-      </>
-    )}
-  </div>
-);
+      </div>
+    </>
+  );
+};
 
 // Red Cross Previous Training Fields
-export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => (
-  <div className="border-t pt-4">
-    <h4 className="font-semibold text-lg text-gray-800 mb-4">ประสบการณ์การฝึกอบรม</h4>
+export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
+  const handleFileChange = (e) => {
+    const { name } = e.target;
+    const file = e.target.files[0];
     
-    <div className="mb-3">
-      <label className="flex items-center">
-        <input
-          type="checkbox"
-          name="hasPreviousTraining"
-          checked={formData.hasPreviousTraining}
-          onChange={handleChange}
-          className="mr-2"
-        />
-        <span className="text-gray-700">ผ่านการฝึกอบรมยุวกาชาดมาก่อน</span>
-      </label>
-    </div>
+    handleChange({
+      target: {
+        name: name,
+        value: file,
+        type: 'file'
+      }
+    });
+  };
 
-    {formData.hasPreviousTraining && (
-      <>
+  return (
+    <>
+      {/* Previous Training Experience Section */}
+      <div className="border-t pt-4">
+        <h4 className="font-semibold text-lg text-gray-800 mb-4">ประสบการณ์การฝึกอบรม</h4>
+        
+        <div className="mb-3">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="hasPreviousTraining"
+              checked={formData.hasPreviousTraining}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <span className="text-gray-700">ผ่านการฝึกอบรมยุวกาชาดมาก่อน</span>
+          </label>
+        </div>
+
+        {formData.hasPreviousTraining && (
+          <>
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                หลักสูตรที่ผ่านการฝึกอบรม
+              </label>
+              <input
+                type="text"
+                name="previousTrainingCourse"
+                value={formData.previousTrainingCourse}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                placeholder="เช่น หลักสูตรครูผู้สอนกิจกรรมยุวกาชาด"
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                เลขที่รุ่น
+              </label>
+              <input
+                type="text"
+                name="previousTrainingNumber"
+                value={formData.previousTrainingNumber}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                placeholder="เลขที่รุ่น"
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                สถานที่ฝึกอบรม
+              </label>
+              <input
+                type="text"
+                name="previousTrainingLocation"
+                value={formData.previousTrainingLocation}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                placeholder="สถานที่ที่เคยฝึกอบรม"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">
+                ระหว่างวันที่
+              </label>
+              <input
+                type="text"
+                name="previousTrainingDate"
+                value={formData.previousTrainingDate}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                placeholder="เช่น 1-7 มกราคม 2568"
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Required Documents Section */}
+      <div className="border-t pt-4 mt-6">
+        <h4 className="font-semibold text-lg text-gray-800 mb-4">เอกสารประกอบการสมัคร</h4>
+
+        {/* File Upload - Supervisor Consent */}
         <div className="mb-3">
           <label className="block text-gray-700 text-sm mb-2">
-            หลักสูตรที่ผ่านการฝึกอบรม
+            คำยินยอมให้รับการฝึกอบรมจากผู้บังคับบัญชา <span className="text-red-500">*</span>
           </label>
           <input
-            type="text"
-            name="previousTrainingCourse"
-            value={formData.previousTrainingCourse}
-            onChange={handleChange}
+            type="file"
+            name="supervisorConsent"
+            onChange={handleFileChange}
+            accept=".pdf,.jpg,.jpeg,.png"
+            required
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="เช่น หลักสูตรครูผู้สอนกิจกรรมยุวกาชาด"
           />
+          {formData.supervisorConsent && (
+            <p className="text-xs text-green-600 mt-1">
+              ✓ ไฟล์: {formData.supervisorConsent.name}
+            </p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            รองรับไฟล์: PDF, JPG, PNG (ขนาดไม่เกิน 5MB)
+          </p>
         </div>
-
-        <div className="mb-3">
-          <label className="block text-gray-700 text-sm mb-2">
-            เลขที่รุ่น
-          </label>
-          <input
-            type="text"
-            name="previousTrainingNumber"
-            value={formData.previousTrainingNumber}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="เลขที่รุ่น"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="block text-gray-700 text-sm mb-2">
-            สถานที่ฝึกอบรม
-          </label>
-          <input
-            type="text"
-            name="previousTrainingLocation"
-            value={formData.previousTrainingLocation}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="สถานที่ที่เคยฝึกอบรม"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 text-sm mb-2">
-            ระหว่างวันที่
-          </label>
-          <input
-            type="text"
-            name="previousTrainingDate"
-            value={formData.previousTrainingDate}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="เช่น 1-7 มกราคม 2568"
-          />
-        </div>
-      </>
-    )}
-  </div>
-);
+      </div>
+    </>
+  );
+};
 
 // Health Fields
 export const HealthFields = ({ formData, handleChange, showHealthCondition = true }) => (

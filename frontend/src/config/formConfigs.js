@@ -34,6 +34,10 @@ export const formConfigs = {
       // Health
       healthCondition: { required: false, type: 'textarea' },
       foodRestrictions: { required: false, type: 'textarea' },
+
+      trainingEvidence: { type: 'file', required: false },      // NEW
+      supervisorConsent: { type: 'file', required: true },      // NEW
+      medicalCertificate: { type: 'file', required: true }, 
       
       // Agreement
       agreeToRules: { required: true, type: 'checkbox' }

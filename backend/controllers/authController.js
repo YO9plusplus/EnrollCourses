@@ -15,7 +15,35 @@ exports.register = async (req, res) => {
             });
         }
 
-        const { email, password, firstName, lastName } = req.body;
+        const { 
+            email, 
+            password, 
+            firstName, 
+            lastName,
+            // Personal Info
+            title,
+            religion,
+            birthDate,
+            age,
+            idCard,
+            // Contact Info
+            mobilePhone,
+            lineId,
+            // Education Info
+            education,
+            major,
+            majorOther,
+            // Work Info
+            position,
+            academicLevel,
+            school,
+            district,
+            officePhone,
+            schoolPhone,
+            // Health Info
+            healthCondition,
+            foodRestrictions
+        } = req.body;
 
         let user = await User.findOne({ email });
         if (user) {
@@ -26,10 +54,34 @@ exports.register = async (req, res) => {
         }
 
         user = new User({
+            // Auth
             email,
             password,
+            // Personal Info
             firstName,
-            lastName
+            lastName,
+            title,
+            religion,
+            birthDate,
+            age,
+            idCard,
+            // Contact Info
+            mobilePhone,
+            lineId,
+            // Education Info
+            education,
+            major,
+            majorOther,
+            // Work Info
+            position,
+            academicLevel,
+            school,
+            district,
+            officePhone,
+            schoolPhone,
+            // Health Info
+            healthCondition,
+            foodRestrictions
         });
 
         await user.save();
@@ -55,6 +107,24 @@ exports.register = async (req, res) => {
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                title: user.title,
+                religion: user.religion,
+                birthDate: user.birthDate,
+                age: user.age,
+                idCard: user.idCard,
+                mobilePhone: user.mobilePhone,
+                lineId: user.lineId,
+                education: user.education,
+                major: user.major,
+                majorOther: user.majorOther,
+                position: user.position,
+                academicLevel: user.academicLevel,
+                school: user.school,
+                district: user.district,
+                officePhone: user.officePhone,
+                schoolPhone: user.schoolPhone,
+                healthCondition: user.healthCondition,
+                foodRestrictions: user.foodRestrictions,
                 role: user.role
             }
         });
@@ -90,7 +160,7 @@ exports.login = async (req, res) => {
             });
         }
 
-        const isMatch = await user.comaprePassword(password);
+        const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(400).json({
                 success: false,
@@ -123,7 +193,7 @@ exports.login = async (req, res) => {
             }
         });
     } catch(err) {
-        console.error('Login error:', error);
+        console.error('Login error:', err);
         res.status(500).json({
             success: false,
             message: 'Server error during login'
@@ -150,7 +220,7 @@ exports.getMe = async (req, res) => {
             user
         });
     } catch(err) {
-        console.error('Get user error:', error);
+        console.error('Get user error:', err);
         res.status(500).json({
             success: false,
             message: 'Server error'

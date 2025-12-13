@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar'
 import CourseCard from '../components/CourseCard'
-import logo_scout from '../assets/logoลูกเสือ.gif'
-import logo_yuwa from '../assets/logoยุว.gif'
+import logo_scout from '../assets/logoลูกเสือ.jpg'
+import logo_yuwa from '../assets/logoยุว.jpg'
 
 const HomePage = () => {
   const courses = [

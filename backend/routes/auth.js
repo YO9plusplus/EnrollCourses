@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 const {
   register,
   login,
-  getCurrentUser,
+  getMe,
   logout,
   updateProfile,
   changePassword
@@ -39,7 +39,7 @@ router.post('/register', registerValidation, register);
 router.post('/login', loginValidation, login);
 
 // Protected routes
-router.get('/me', auth, getCurrentUser);
+router.get('/me', auth, getMe);
 router.post('/logout', auth, logout);
 router.put('/profile', auth, updateProfileValidation, updateProfile);
 router.put('/change-password', auth, changePasswordValidation, changePassword);
