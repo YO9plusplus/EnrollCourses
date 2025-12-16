@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.data.user);
             }
         } catch(err) {
-            console.error('Token verification failed:', error);
+            console.error('Token verification failed:', err);
             logout();
         } finally {
             setLoading(false);
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         } catch(err) {
             return {
                 success: false,
-                message: error.response?.data?.message || 'Login failed'
+                message: err.response?.data?.message || 'Login failed'
             };
         }
     };

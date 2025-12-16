@@ -102,7 +102,7 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full bg-[#2d6e5e] text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
+                className={`w-full bg-[#2d6e5e] cursor-pointer text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
                   loading 
                     ? 'opacity-50 cursor-not-allowed' 
                     : 'hover:bg-opacity-90 hover:shadow-lg'

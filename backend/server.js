@@ -6,11 +6,16 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const authRoutes = require('./routes/auth');
+const registrationRoutes = require('./routes/registration');
 
 const app = express();
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173'
+  origin: [
+    'http://localhost:5173',
+    'https://enrollcourses.onrender.com'
+  ],
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded( { extended: true }));
@@ -19,6 +24,7 @@ const connectDB = require('./config/db');
 connectDB();
 
 app.use('/api/auth', authRoutes);
+app.use('/api/registrations', registrationRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -148,7 +148,7 @@ const DetailPage = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-[#2d6e5e] text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 hover:shadow-lg transition-all duration-300"
+                  className="w-full bg-[#2d6e5e] cursor-pointer text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 hover:shadow-lg transition-all duration-300"
                 >
                   ยืนยันการลงทะเบียน
                 </button>

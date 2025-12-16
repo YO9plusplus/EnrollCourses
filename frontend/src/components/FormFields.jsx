@@ -917,7 +917,7 @@ export const AgreementField = ({ formData, handleChange }) => (
         checked={formData.agreeToRules}
         onChange={handleChange}
         required
-        className="mt-1 mr-2"
+        className="mt-1 mr-2 cursor-pointer"
       />
       <span className="text-gray-700">
         ข้าพเจ้าทราบระเบียบและจะปฏิบัติตามกฎของการฝึกอบรมทุกประการ และสามารถเข้ารับการฝึกอบรมได้ตลอดหลักสูตร <span className="text-red-500">*</span>
