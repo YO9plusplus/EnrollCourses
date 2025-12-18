@@ -12,6 +12,7 @@ import {
 } from "../components/FormFields";
 import logo_scout from '../assets/logoลูกเสือ.jpg'
 import logo_yuwa from '../assets/logoยุว.jpg'
+import api from '../utils/api'
 
 const DetailPage = () => {
   const { id } = useParams();
@@ -61,24 +62,57 @@ const DetailPage = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const submissionData = new FormData();
-
-        submissionData.append('userId', user.id);
-        submissionData.append('courseId', id);
-
-        Object.keys(formData).forEach(key => {
-          if (formData[key] instanceof File) {
-            submissionData.append(key, formData[key]);
-          } else if (typeof formData[key] === 'boolean') {
-            submissionData.append(key, formData[key].toString());
-          } else if (formData[key]) {
-            submissionData.append(key, formData[key]);
+        try {
+          // Validate required fields
+          if (!formData.courseType) {
+            alert('กรุณาเลือกหลักสูตร');
+            return;
           }
-        });
-        console.log('Form submitted:', formData);
+          
+          if (!formData.agreeToRules) {
+            alert('กรุณายอมรับเงื่อนไขการฝึกอบรม');
+            return;
+          }
+          const submissionData = new FormData();
+  
+          // Add required fileds
+          submissionData.append('courseId', id);
+          submissionData.append('courseType', formData.courseType);
+          submissionData.append('agreeToRules', formData.agreeToRules);
+  
+          Object.keys(formData).forEach(key => {
+            if (key === 'courseType' || key === 'agreeToRules') {
+              return;
+            }
+
+            if (formData[key] instanceof File) {
+              submissionData.append(key, formData[key]);
+            } else if (typeof formData[key] === 'boolean') {
+              submissionData.append(key, formData[key].toString());
+            } else if (formData[key]) {
+              submissionData.append(key, formData[key]);
+            }
+          });
+          console.log('Submitting registration...');
+
+          // Send to API
+          const response = await api.post('/registrations', submissionData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+
+          if (response.data.success) {
+            alert('✅ ลงทะเบียนสำเร็จ!');
+            navigate('/');
+          }
+        } catch(error) {
+          console.error('Registration error:', error);
+          alert('❌ เกิดข้อผิดพลาด: ' + (error.response?.data?.message || 'ไม่สามารถลงทะเบียนได้'));
+        }
     };
 
     const currentCourse = courses.find(c => c.id === parseInt(id));

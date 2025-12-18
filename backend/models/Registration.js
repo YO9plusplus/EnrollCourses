@@ -4,7 +4,7 @@ const registrationSchema = new mongoose.Schema({
     // Reference to User
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',
+        ref: 'User',
         required: true
     },
 

@@ -7,11 +7,65 @@ const ExcelJS = require('exceljs');
 // @access  Private
 exports.createRegistration = async (req, res) => {
     try {
-        const registration = new Registration({
+        console.log('Request body:', req.body);
+        console.log('Files:', req.files);
+
+        const registrationData = new Registration({
             user: req.user.id,
-            ...req.body
+            courseId: req.body.courseId,
+            courseType: req.body.courseType,
+            agreeToRules: req.body.agreeToRules === 'true',
+
+            // Previous training (Scout)
+            hasBasicTraining: req.body.hasBasicTraining === 'true',
+            trainingType: req.body.trainingType,
+            trainingLocation: req.body.trainingLocation,
+            trainingDate: req.body.trainingDate,
+            
+            // Previous training (Red Cross)
+            hasPreviousTraining: req.body.hasPreviousTraining === 'true',
+            previousTrainingCourse: req.body.previousTrainingCourse,
+            previousTrainingNumber: req.body.previousTrainingNumber,
+            previousTrainingLocation: req.body.previousTrainingLocation,
+            previousTrainingDate: req.body.previousTrainingDate,
         });
 
+        // Handle file uploads
+        if (req.files) {
+            if (req.files.trainingEvidence) {
+                const file = req.files.trainingEvidence[0];
+                registrationData.trainingEvidence = {
+                    filename: file.originalname,
+                    filepath: file.path,
+                    mimetype: file.mimetype,
+                    size: file.size
+                };
+            }
+            
+            if (req.files.supervisorConsent) {
+                const file = req.files.supervisorConsent[0];
+                registrationData.supervisorConsent = {
+                    filename: file.originalname,
+                    filepath: file.path,
+                    mimetype: file.mimetype,
+                    size: file.size
+                };
+            }
+                
+            if (req.files.medicalCertificate) {
+                const file = req.files.medicalCertificate[0]
+                registrationData.medicalCertificate = {
+                    filename: file.originalname,
+                    filepath: file.path,
+                    mimetype: file.mimetype,
+                    size: file.size
+                };
+            }
+            
+        }
+
+
+        const registration = new Registration(registrationData);
         await registration.save();
 
         res.status(201).json({

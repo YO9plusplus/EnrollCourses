@@ -2,10 +2,16 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
+const { upload } = require('../middleware/cloudinaryUpload');
 const registrationController = require('../controllers/registrationController');
 
 // User routes (authenticated)
-router.post('/', auth, registrationController.createRegistration);
+router.post('/', auth, upload.fields([
+{ name: 'trainingEvidence', maxCount: 1 },
+    { name: 'supervisorConsent', maxCount: 1 },
+    { name: 'medicalCertificate', maxCount: 1 },
+]), registrationController.createRegistration)
+
 router.get('/my-registration', auth, registrationController.getMyRegistrations);
 router.get('/:id', auth, registrationController.getRegistrationById);
 
