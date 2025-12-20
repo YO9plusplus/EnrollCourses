@@ -98,8 +98,8 @@ const AdminDashboard = () => {
                 r.user.school?.toLowerCase().includes(searchTerm.toLowerCase())
             );
 
-            setFilteredRegistrations(filtered);
         }
+        setFilteredRegistrations(filtered);
     }, [selectedCourse, selectedStatus, searchTerm, registrations]);
 
     const handleStatusChange = async (registrationId, newStatus) => {
