@@ -32,11 +32,14 @@ const Navbar = () => {
                 สวัสดี, {user.firstName} {user.lastName}
               </span>
               {user && user.role !== 'admin' && (
-                <Link to="/my-registrations"
-                      className="text-[#2d6e5e] font-medium hover:text-[#1f5045] border border-[#2d6e5e] px-4 py-2 rounded-lg hover:bg-[#f0f9f7] transition-colors duration-200"
-                >
-                  การสมัครของฉัน
-                </Link>
+                  <>
+                      <Link to="/profile/edit" className="text-[#2d6e5e] font-medium hover:text-[#1f5045] border border-[#2d6e5e] px-4 py-2 rounded-lg hover:bg-[#f0f9f7] transition-colors duration-200">
+                          แก้ไขโปรไฟล์
+                      </Link>
+                      <Link to="/my-registrations" className="text-[#2d6e5e] font-medium hover:text-[#1f5045] border border-[#2d6e5e] px-4 py-2 rounded-lg hover:bg-[#f0f9f7] transition-colors duration-200">
+                          การสมัครของฉัน
+                      </Link>
+                  </>
               )}
               <button
                 onClick={handleLogout}

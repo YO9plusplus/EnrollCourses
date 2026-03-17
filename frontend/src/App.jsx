@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MyRegistrationPage from './pages/MyRegistrationPage';
+import EditProfilePage from './pages/EditProfilePage';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path='/admin/dashboard' element={<AdminDashboard />} />
           <Route path='/my-registrations' element={<MyRegistrationPage />} />
+          <Route path='/profile/edit' element={<EditProfilePage />} />
         </Routes>
     </AuthProvider>
   )

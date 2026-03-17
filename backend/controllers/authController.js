@@ -263,11 +263,20 @@ exports.updateProfile = async (req, res) => {
             });
         }
 
-        const { firstName, lastName } = req.body;
+        const allowedFields = [
+            'firstName', 'lastName', 'title', 'religion',
+            'birthDate', 'age', 'mobilePhone', 'lineId',
+            'education', 'major', 'position', 'academicLevel',
+            'school', 'district', 'officePhone', 'schoolPhone',
+            'healthCondition', 'foodRestrictions'
+        ];
 
         const updateFields = {};
-        if (firstName) updateFields.firstName = firstName;
-        if (lastName) updateFields.lastName = lastName;
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                updateFields[field] = req.body[field];
+            }
+        });
 
         const user = await User.findByIdAndUpdate(
             req.user.id,

@@ -27,8 +27,12 @@ const loginValidation = [
 ];
 
 const updateProfileValidation = [
-  body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
-  body('lastName').optional().notEmpty().withMessage('Last name cannot be empty')
+    body('firstName').optional().notEmpty().withMessage('กรุณากรอกชื่อ'),
+    body('lastName').optional().notEmpty().withMessage('กรุณากรอกนามสกุล'),
+    body('title').optional().isIn(['นาย', 'นาง', 'นางสาว', 'อื่นๆ']),
+    body('mobilePhone').optional(),
+    body('age').optional().isInt({ min: 1, max: 120 }).withMessage('อายุไม่ถูกต้อง'),
+    body('idCard').optional().isLength({ max: 13 }).withMessage('เลขบัตรประชาชนไม่ถูกต้อง'),
 ];
 
 const changePasswordValidation = [
