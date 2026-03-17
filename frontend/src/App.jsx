@@ -7,18 +7,20 @@ import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MyRegistrationPage from './pages/MyRegistrationPage';
 import EditProfilePage from './pages/EditProfilePage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <AuthProvider>
         <Routes>
           <Route path="/" element={<HomePage/>} />
-          <Route path="detail/:id" element={<DetailPage/>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path='/admin/dashboard' element={<AdminDashboard />} />
-          <Route path='/my-registrations' element={<MyRegistrationPage />} />
-          <Route path='/profile/edit' element={<EditProfilePage />} />
+
+          <Route path="detail/:id" element={<ProtectedRoute><DetailPage /></ProtectedRoute>} />
+          <Route path='/admin/dashboard' element={<ProtectedRoute adminOnly={true}><AdminDashboard /></ProtectedRoute>} />
+          <Route path='/my-registrations' element={<ProtectedRoute><MyRegistrationPage /></ProtectedRoute>} />
+          <Route path='/profile/edit' element={ <ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         </Routes>
     </AuthProvider>
   )

@@ -143,7 +143,6 @@ const DetailPage = () => {
                   <div><span className="text-gray-600">โทร:</span> <span className="font-medium">{user?.mobilePhone || '-'}</span></div>
                   <div><span className="text-gray-600">โรงเรียน:</span> <span className="font-medium">{user?.school || '-'}</span></div>
                 </div>
-                <p className="text-xs text-blue-700 mt-2">💡 แก้ไขข้อมูลได้ที่หน้าโปรไฟล์</p>
               </div>
 
               <h3 className="text-2xl font-bold text-gray-800 mb-6">
