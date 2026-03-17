@@ -7,6 +7,18 @@ const ExcelJS = require('exceljs');
 // @access  Private
 exports.createRegistration = async (req, res) => {
     try {
+        const existing = await Registration.findOne({
+            user: req.user.id,
+            courseId: req.body.courseId
+        })
+
+        if (existing) {
+            return res.status(400).json({
+                success: false,
+                message: 'คุณได้สมัครหลักสูตรนี้ไปแล้ว'
+            })
+        }
+
         console.log('Request body:', req.body);
         console.log('Files:', req.files);
 

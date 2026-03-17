@@ -2,8 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const rateLimit = require('express-rate-limit');
 
 dotenv.config();
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    success: false,
+    message: 'Too many requests, please try again later'
+  }
+})
 
 const authRoutes = require('./routes/auth');
 const registrationRoutes = require('./routes/registration');
@@ -23,6 +33,7 @@ app.use(express.urlencoded( { extended: true }));
 const connectDB = require('./config/db');
 connectDB();
 
+app.use(globalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/registrations', registrationRoutes);
 

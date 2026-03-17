@@ -11,6 +11,8 @@ const {
   changePassword
 } = require('../controllers/authController');
 
+const rateLimit = require('express-rate-limit');
+
 // Validation rules
 const registerValidation = [
   body('email').isEmail().withMessage('Please enter a valid email'),
@@ -34,9 +36,20 @@ const changePasswordValidation = [
   body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
 ];
 
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: {
+    success: false,
+    message: 'พยายาม login มากเกินไป กรุณารอ 15 นาที'
+  }
+});
+
 // Public routes
-router.post('/register', registerValidation, register);
-router.post('/login', loginValidation, login);
+
+router.post('/register', authLimiter, registerValidation, register);
+router.post('/login', authLimiter, loginValidation, login);
 
 // Protected routes
 router.get('/me', auth, getMe);

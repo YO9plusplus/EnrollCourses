@@ -13,7 +13,6 @@ router.post('/', auth, upload.fields([
 ]), registrationController.createRegistration)
 
 router.get('/my-registration', auth, registrationController.getMyRegistrations);
-router.get('/:id', auth, registrationController.getRegistrationById);
 
 // Admin routes (admin only)
 router.get('/admin/all', auth, adminAuth, registrationController.getAllRegistrations);
@@ -22,5 +21,6 @@ router.get('/admin/status/:status', auth, adminAuth, registrationController.getR
 router.put('/admin/:id/status', auth, adminAuth, registrationController.updateRegistrationStatus);
 router.put('/admin/:id/notes', auth, adminAuth, registrationController.updateAdminNotes);
 router.get('/admin/export/:courseId', auth, adminAuth, registrationController.exportToExcel);
+router.get('/:id', auth, registrationController.getRegistrationById);
 
 module.exports = router;
