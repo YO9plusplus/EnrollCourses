@@ -91,15 +91,18 @@ const AdminDashboard = () => {
 
         // Search
         if (searchTerm) {
-            filtered = filtered.filter(r => 
-                r.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                r.user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                r.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                r.user.school?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            filtered = filtered.filter(r => {
+                const fullName = `${r.user.firstName} ${r.user.lastName}`.toLowerCase();
+                const term = searchTerm.toLowerCase();
 
-            setFilteredRegistrations(filtered);
+                return (
+                    fullName.includes(term) ||
+                    r.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    r.user.school?.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            });
         }
+        setFilteredRegistrations(filtered);
     }, [selectedCourse, selectedStatus, searchTerm, registrations]);
 
     const handleStatusChange = async (registrationId, newStatus) => {
