@@ -31,6 +31,13 @@ const Navbar = () => {
               <span className="text-gray-700 font-medium mt-1.5">
                 สวัสดี, {user.firstName} {user.lastName}
               </span>
+              {user && user.role !== 'admin' && (
+                <Link to="/my-registrations"
+                      className="text-[#2d6e5e] font-medium hover:text-[#1f5045] border border-[#2d6e5e] px-4 py-2 rounded-lg hover:bg-[#f0f9f7] transition-colors duration-200"
+                >
+                  การสมัครของฉัน
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="bg-red-600 cursor-pointer hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"

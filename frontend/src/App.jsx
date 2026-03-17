@@ -5,6 +5,7 @@ import DetailPage from './pages/DetailPage'
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
+import MyRegistrationPage from './pages/MyRegistrationPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path='/admin/dashboard' element={<AdminDashboard />} />
+          <Route path='/my-registrations' element={<MyRegistrationPage />} />
         </Routes>
     </AuthProvider>
   )
