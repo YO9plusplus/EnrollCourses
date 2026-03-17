@@ -7,7 +7,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleHome = () => {
-    navigate('/');
+    if (user?.role === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/');
+    }
   }
 
   const handleLogout = () => {

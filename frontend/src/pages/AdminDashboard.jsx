@@ -270,13 +270,13 @@ const AdminDashboard = () => {
             <div className="mt-4 flex gap-4">
                 <button
                 onClick={() => handleExport('10')}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                 📥 ส่งออก Excel (ลูกเสือ)
                 </button>
                 <button
                 onClick={() => handleExport('11')}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                 📥 ส่งออก Excel (ยุวกาชาด)
                 </button>
@@ -362,7 +362,7 @@ const AdminDashboard = () => {
                             )}
                             <button
                                 onClick={() => handleViewDetails(registration)}
-                                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                className="px-3 py-1 cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                             >
                                 ดูรายละเอียด
                             </button>
