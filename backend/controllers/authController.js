@@ -146,7 +146,7 @@ exports.login = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
-                errors: errors.array
+                errors: errors.array()
             });
         }
 
@@ -270,7 +270,7 @@ exports.updateProfile = async (req, res) => {
         if (lastName) updateFields.lastName = lastName;
 
         const user = await User.findByIdAndUpdate(
-            req.user.user.id,
+            req.user.id,
             { $set: updateFields },
             { new: true, runValidators: true }
         ).select('-password');
@@ -288,7 +288,7 @@ exports.updateProfile = async (req, res) => {
             user
         });
     } catch(err) {
-        console.error('Update profile error:', error);
+        console.error('Update profile error:', err);
         res.status(500).json({ 
             success: false,
             message: 'Server error' 
@@ -312,7 +312,7 @@ exports.changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     // Get user with password
-    const user = await User.findById(req.user.user.id);
+    const user = await User.findById(req.user.id);
     
     if (!user) {
       return res.status(404).json({

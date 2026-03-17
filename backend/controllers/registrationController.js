@@ -65,13 +65,12 @@ exports.createRegistration = async (req, res) => {
         }
 
 
-        const registration = new Registration(registrationData);
-        await registration.save();
+        await registrationData.save();
 
         res.status(201).json({
             success: true,
             message: 'Registration submitted successfully',
-            registration
+            registration: registrationData,
         });
     } catch(err) {
         console.error('Create registration error: ', err);
@@ -190,8 +189,8 @@ exports.updateRegistrationStatus = async (req, res) => {
             req.params.id,
             {
                 status,
-                reviewdBy: req.user.id,
-                reviewdAt: Date.now()
+                reviewedBy: req.user.id,
+                reviewedAt: Date.now()
             },
             { new: true }
         ).populate('user', '-password');
