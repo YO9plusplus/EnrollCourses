@@ -16,7 +16,7 @@ const registrationSchema = new mongoose.Schema({
     },
     courseType: {
         type: String,
-        required: true
+        required: false
     },
 
     // Previous Training (ลูกเสือ)

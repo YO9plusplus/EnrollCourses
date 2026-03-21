@@ -25,6 +25,28 @@ const courseSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+
+	status: {
+		type: String,
+		enum: ['upcoming', 'open', 'full', 'closed'],
+		default: 'upcoming'
+	},
+
+	capacity: {
+		type: Number,
+		default: null,
+	},
+	enrolledCount: {
+		type: Number,
+		default: 0
+	},
+
+	courseKey: {
+		type: String,
+		enum: ['scout', 'redcross'],
+		default: null,
+		sparse: true,
+	},
 }, { timestamps: true });
 
 module.exports = mongoose.model('Course', courseSchema);
