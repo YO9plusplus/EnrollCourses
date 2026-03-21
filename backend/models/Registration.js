@@ -10,9 +10,9 @@ const registrationSchema = new mongoose.Schema({
 
     // Course Information
     courseId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
         required: true,
-        enum: ['10', '11']
     },
     courseType: {
         type: String,
@@ -76,25 +76,12 @@ const registrationSchema = new mongoose.Schema({
 
     // Admin Notes
     adminNotes: String,
-    reviewdBy: {
+    reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    reviewdAt: Date,
+    reviewedAt: Date,
 
-    // Timestamps
-    submittedAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-registrationSchema.pre('save', function() {
-    this.updatedAt = Date.now();
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Registration', registrationSchema);
