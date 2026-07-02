@@ -28,8 +28,8 @@ const courseSchema = new mongoose.Schema({
 
 	status: {
 		type: String,
-		enum: ['upcoming', 'open', 'full', 'closed'],
-		default: 'upcoming'
+		enum: ['open', 'full', 'closed'],
+		default: 'open'
 	},
 
 	capacity: {
@@ -41,12 +41,18 @@ const courseSchema = new mongoose.Schema({
 		default: 0
 	},
 
-	courseKey: {
+	subCourses: [{
+		value: { type: String, required: true },
+		label: { type: String, required: true },
+		duration: { type: String },
+		requirement: { type: String },
+	}],
+
+	formType: {
 		type: String,
-		enum: ['scout', 'redcross'],
 		default: null,
-		sparse: true,
 	},
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Course', courseSchema);

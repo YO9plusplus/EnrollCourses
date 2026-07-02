@@ -23,24 +23,30 @@ const AdminLayout = ({ children }) => {
                   to="/admin/dashboard"
                   className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/admin/dashboard')}`}
                 >
-                  📝 จัดการใบสมัคร
+                  จัดการใบสมัคร
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/admin/users"
-                  className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/admin/users')}`}
+                <Link
+                  to='/admin/courses'
+                  className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/admin/courses')}`}
+                >
+                  จัดการหลักสูตร
+                </Link>
+              </li>
+              <li>
+                <span 
+                  className='block px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed'
                 >
                   👥 จัดการผู้ใช้
-                </Link>
+                </span>
               </li>
               <li>
-                <Link 
-                  to="/admin/reports"
-                  className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/admin/reports')}`}
+                <span 
+                  className='block px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed'
                 >
                   📈 รายงาน
-                </Link>
+                </span>
               </li>
             </ul>
           </nav>

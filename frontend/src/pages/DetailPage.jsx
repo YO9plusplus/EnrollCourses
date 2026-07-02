@@ -19,6 +19,8 @@ const DetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Redirect ถ้าไม่ได้ login
   useEffect(() => {
@@ -36,7 +38,9 @@ const DetailPage = () => {
         setCourse(fetchedCourse);
 
         // Initialize formData หลัง fetch เสร็จ
-        const config = formConfigs[fetchedCourse.courseKey];
+        const config = fetchCourse ? formConfigs[fetchedCourse.formType] : null;
+        const ExtraFieldsComponent = fetchedCourse.formType ? extraFieldComponents[fetchedCourse.formType] : null;
+
         if (config) {
           const initialData = {};
           config.extraFields.forEach(field => {
@@ -57,11 +61,8 @@ const DetailPage = () => {
     fetchCourse();
   }, [id]);
 
-  const config = course?.courseKey ? formConfigs[course.courseKey] : null;
-
-  const ExtraFieldsComponent = course?.courseKey
-    ? extraFieldComponents[course.courseKey]
-    : null;
+  const config = course?.formType ? formConfigs[course.formType] : null;
+  const ExtraFieldsComponent = course?.formType ? extraFieldComponents[course.formType] : null;
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -73,9 +74,11 @@ const DetailPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setUploadProgress(0);
 
     try {
-      if (config?.courseOptions?.length > 0 && !formData.courseType) {
+      if (course?.courseOptions?.length > 0 && !formData.courseType) {
         alert('กรุณาเลือกหลักสูตร');
         return;
       }
@@ -102,17 +105,17 @@ const DetailPage = () => {
         }
       });
 
-      const response = await api.post('/registrations', submissionData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await api.post('/registrations', submissionData);
 
       if (response.data.success) {
         alert('✅ ลงทะเบียนสำเร็จ!');
         navigate('/');
       }
     } catch(error) {
-      console.error('Registration error:', error);
       alert('❌ เกิดข้อผิดพลาด: ' + (error.response?.data?.message || 'ไม่สามารถลงทะเบียนได้'));
+    } finally {
+      setSubmitting(false);
+      setUploadProgress(0);
     }
   };
 
@@ -157,22 +160,32 @@ const DetailPage = () => {
               </div>
 
               {/* ถ้าไม่มี config → แสดงข้อความแทน */}
-              {!config ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 text-lg mb-2">⚠️ หลักสูตรนี้ไม่เปิดรับสมัครออนไลน์</p>
-                  <p className="text-gray-400 text-sm">กรุณาติดต่อสถาบันโดยตรง</p>
-                </div>
+              {course.status === 'full' ? (
+                  <div className="text-center py-8">
+                      <p className="text-gray-800 text-lg font-medium mb-2">หลักสูตรนี้เต็มแล้ว</p>
+                      <p className="text-gray-400 text-sm">ไม่สามารถลงทะเบียนได้ในขณะนี้</p>
+                  </div>
+              ) : course.status === 'closed' ? (
+                  <div className="text-center py-8">
+                      <p className="text-gray-800 text-lg font-medium mb-2">ปิดรับสมัครแล้ว</p>
+                      <p className="text-gray-400 text-sm">กรุณาติดต่อสถาบันโดยตรง</p>
+                  </div>
+              ) : !config ? (
+                  <div className="text-center py-8">
+                      <p className="text-gray-500 text-lg mb-2">⚠️ หลักสูตรนี้ไม่เปิดรับสมัครออนไลน์</p>
+                      <p className="text-gray-400 text-sm">กรุณาติดต่อสถาบันโดยตรง</p>
+                  </div>
               ) : (
                 <>
                   <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    แบบฟอร์มลงทะเบียน
+                    
                   </h3>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Course Selection */}
-                    {config.courseOptions?.length > 0 && (
+                    {course.subCourses?.length > 0 && (
                       <CourseSelectionField
-                        options={config.courseOptions}
+                        options={config.subCourses}
                         formData={formData}
                         handleChange={handleChange}
                       />
@@ -192,11 +205,24 @@ const DetailPage = () => {
                       handleChange={handleChange}
                     />
 
+                    {submitting && (
+                      <div className="mb-4">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-[#2d6e5e] h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1 text-center">{uploadProgress}%</p>
+                      </div>
+                    )}
+
                     <button
                       type="submit"
-                      className="w-full bg-[#2d6e5e] cursor-pointer text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 hover:shadow-lg transition-all duration-300"
+                      disabled={submitting}
+                      className="w-full bg-[#2d6e5e] text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 hover:shadow-lg transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                     >
-                      ยืนยันการลงทะเบียน
+                      {submitting ? 'กำลังส่งข้อมูล...' : 'ยืนยันการลงทะเบียน'}
                     </button>
                   </form>
                 </>

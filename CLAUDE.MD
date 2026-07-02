@@ -1,1 +1,1 @@
-Do not write or edit any code. Only provide advice, explanations, and suggestions.
+Show code snippets in chat responses when the user asks, but do not edit or write to any project files directly. The user reads the code and implements it themselves.

@@ -1,5 +1,26 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+
+const ALGORITHM = 'aes-256-cbc';
+const KEY = Buffer.from(process.env.ENCRYPTION_KEY.padEnd(32).slice(0, 32));
+
+const encrypt = (text) => {
+  if (!text) return text;
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
+  const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
+  return iv.toString('hex')+ ":" + encrypted.toString('hex');
+}
+
+const decrypt = (text) => {
+  if (!text) return text;
+  const [ivHex, encryptedHex] = text.split(':');
+  const iv = Buffer.from(ivHex, 'hex');
+  const encrypted = Buffer.from(encryptedHex, 'hex');
+  const decipher = crypto.createDecipheriv(ALGORITHM, KEY, iv);
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
+}
 
 const userSchema = new mongoose.Schema({
   // Auth fields
@@ -42,7 +63,6 @@ const userSchema = new mongoose.Schema({
   age: Number,
   idCard: {
     type: String,
-    maxlength: 13
   },
 
   // Contact Info (from ContactFields)
@@ -81,17 +101,24 @@ userSchema.pre('save', async function() {
   this.updatedAt = Date.now();
   
   // Hash password only if modified
-  if (!this.isModified('password')) {
-    return;
+  
+  if (this.isModified('password')) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.isModified('idCard') && this.idCard) {
+    this.idCard = encrypt(this.idCard);
+  }
 });
 
 // Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+userSchema.methods.getIdCard = function() {
+  return decrypt(this.idCard);
+}
 
 module.exports = mongoose.model('User', userSchema);

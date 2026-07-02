@@ -21,6 +21,7 @@ router.get('/admin/status/:status', auth, adminAuth, registrationController.getR
 router.put('/admin/:id/status', auth, adminAuth, registrationController.updateRegistrationStatus);
 router.put('/admin/:id/notes', auth, adminAuth, registrationController.updateAdminNotes);
 router.get('/admin/export/:courseId', auth, adminAuth, registrationController.exportToExcel);
+router.get('/admin/signed-url', auth, adminAuth, registrationController.getSignedUrl);
 router.get('/:id', auth, registrationController.getRegistrationById);
 
 module.exports = router;

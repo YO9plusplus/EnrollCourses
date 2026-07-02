@@ -10,11 +10,6 @@ const statusConfig = {
 	complete: { label: 'เสร็จสิ้น', color: 'bg-blue-100 text-blue-800'},
 };
 
-const courseNames = {
-	'10': 'ฝึกอบรมบุคลกรทางการลูกเสือ',
-	'11': 'ฝึกอบรมผู้บังคับบัญชายุวกาชาต',
-}
-
 export default function MyRegistrationPage() {
 	const [registrations, setRegistrations] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -94,13 +89,13 @@ export default function MyRegistrationPage() {
                                     {/* Course Info */}
                                     <div className="flex-1">
                                         <h2 className="text-lg font-semibold text-[#2d6e5e] mb-1">
-                                            {courseNames[reg.courseId] ?? reg.courseType}
+                                            {reg.courseId?.title ?? reg.courseType}
                                         </h2>
                                         <p className="text-sm text-gray-500">
                                             {reg.courseType}
                                         </p>
                                         <p className="text-xs text-gray-400 mt-1">
-                                            สมัครเมื่อ: {new Date(reg.submittedAt).toLocaleDateString('th-TH', {
+                                            สมัครเมื่อ: {new Date(reg.createdAt).toLocaleDateString('th-TH', {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric'

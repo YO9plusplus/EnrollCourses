@@ -2,6 +2,7 @@ import Navbar from '../components/Navbar'
 import CourseCard from '../components/CourseCard'
 import { useState, useEffect } from 'react'
 import api from '../utils/api'
+import CourseCalendar from '../components/CourseCalendar'
 
 const HomePage = () => {
   const [courses, setCourses] = useState([]);
@@ -54,6 +55,12 @@ const HomePage = () => {
             ))}
           </div>
         </div>
+      </div>
+      <div className='mt-4 md:mt-6 pb-12'>
+        <h2 className='text-2xl md:text-3xl font-bold text-white text-center mb-4'>
+          ปฏิทินรายเดือน
+        </h2>
+        <CourseCalendar courses={courses} />
       </div>
     </div>
   );

@@ -564,7 +564,8 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
       target: {
         name: name,
         value: file,
-        type: 'file'
+        type: 'file',
+        files: [file]
       }
     });
   };
@@ -748,7 +749,8 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
       target: {
         name: name,
         value: file,
-        type: 'file'
+        type: 'file',
+        files: [file]
       }
     });
   };

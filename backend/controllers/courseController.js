@@ -1,30 +1,32 @@
 const Course = require('../models/Course');
+const { getEffectiveStatus } = require('../utils/courseStatus');
 
 exports.createCourse = async (req, res) => {
-	try {
-		const courseData = new Course({
-			title: req.body.title,
-			image: req.body.image,
-			dates: req.body.dates,
-			location: req.body.location,
-			fullDescription: req.body.fullDescription,
-		});
+    try {
+        const rawDates = req.body.dates;
+        const dates = rawDates
+            ? (Array.isArray(rawDates) ? rawDates : [rawDates])
+            : [];
 
-		await courseData.save();
+        const courseData = new Course({
+            title: req.body.title,
+            image: req.file?.path || req.body.image,
+            dates,
+            location: req.body.location,
+            fullDescription: req.body.fullDescription,
+			status: req.body.status || 'open',
+            capacity: req.body.capacity ? Number(req.body.capacity) : null,
+            formType: req.body.formType || null,
+            subCourses: req.body.subCourses ? JSON.parse(req.body.subCourses) : [],
+        });
 
-		res.status(201).json({
-			success : true,
-			message: 'Course created successfully',
-			course: courseData
-		});
-	} catch (err) {
-		console.error('Create course error: ', err);
-		res.status(500).json({
-			success: false,
-			message: 'Failed to create course',
-			error: err.message
-		});
-	}
+        await courseData.save();
+
+        res.status(201).json({ success: true, message: 'Course created successfully', course: courseData });
+    } catch (err) {
+        console.error('Create course error:', err);
+        res.status(500).json({ success: false, message: 'Failed to create course', error: err.message });
+    }
 };
 
 exports.getAllCourses = async (req, res) => {
@@ -38,12 +40,20 @@ exports.getAllCourses = async (req, res) => {
 			});
 		}
 
+		const coursesWithStatus = courses.map((course) => {
+			const obj = course.toObject();
+			obj.status = getEffectiveStatus(course);
+			return obj;
+		})
+
 		res.json({
 			success: true,
-			count: courses.length,
-			courses
+			count: coursesWithStatus.length,
+			courses: coursesWithStatus
 		});
 	} catch(err) {
+		console.error('getAllCourses error:', err);
+
 		res.status(500).json({
 			success: false,
 			message: 'Failed to get courses',
@@ -64,9 +74,12 @@ exports.getCourse = async (req, res) => {
 			});
 		}
 
+		const obj = course.toObject();
+		obj.status = getEffectiveStatus(course);
+
 		res.json({
 			success: true,
-			course
+			course: obj
 		});
 	} catch(err) {
 		res.status(500).json({
@@ -80,10 +93,38 @@ exports.updateCourse = async (req, res) => {
 	try {
 		const { id } = req.params;
 
+		const rawDates = req.body.dates;
+		const dates = rawDates
+			? (Array.isArray(rawDates) ? rawDates : [rawDates]).flat().filter(Boolean)
+			: undefined;
+
+		const updateData = {
+			title: req.body.title,
+			location: req.body.location,
+			fullDescription: req.body.fullDescription,
+			status: req.body.status,
+			formType: req.body.formType || null,
+			capacity: req.body.capacity ? Number(req.body.capacity) : null,
+		};
+		if (dates?.length) updateData.dates = dates;
+		if (req.file?.path) {
+			updateData.image = req.file.path;
+		}
+
+		if (req.body.subCourses) {
+			updateData.subCourses = JSON.parse(req.body.subCourses);
+		}
+
+		if ('capacity' in updateData) {
+			updateData.capacity = updateData.capacity && !isNaN(Number(updateData.capacity))
+				? Number(updateData.capacity)
+				: null;
+		}
+
 		const course = await Course.findByIdAndUpdate(
 			id,
-			{ ...req.body },
-			{ new: true }
+			updateData,
+			{ new: true, runValidators: true }
 		);
 
 		if (!course) {

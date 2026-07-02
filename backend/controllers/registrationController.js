@@ -1,3 +1,5 @@
+const { cloudinary } = require('../middleware/cloudinaryUpload');
+const Course = require('../models/Course');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
 const ExcelJS = require('exceljs');
@@ -18,9 +20,6 @@ exports.createRegistration = async (req, res) => {
                 message: 'คุณได้สมัครหลักสูตรนี้ไปแล้ว'
             })
         }
-
-        console.log('Request body:', req.body);
-        console.log('Files:', req.files);
 
         const registrationData = new Registration({
             user: req.user.id,
@@ -100,7 +99,8 @@ exports.createRegistration = async (req, res) => {
 exports.getMyRegistrations = async (req, res) => {
     try {
         const registrations = await Registration.find({ user: req.user.id })
-            .sort({ submittedAt: -1 });
+            .populate('courseId', 'title formType')
+            .sort({ createdAt: -1 });
         
             res.json({
                 success: true,
@@ -123,8 +123,9 @@ exports.getAllRegistrations = async (req, res) => {
     try {
         const registrations = await Registration.find()
             .populate('user', '-password')
-            .populate('reviewdBy', 'firstName lastName')
-            .sort({ submittedAt: -1 });
+            .populate('courseId', 'title formType')
+            .populate('reviewedBy', 'firstName lastName')
+            .sort({ createdAt: -1 });
 
         res.json({
             success: true,
@@ -149,7 +150,7 @@ exports.getRegistrationsByCourse = async (req, res) => {
 
         const registrations = await Registration.find({ courseId })
             .populate('user', '-password')
-            .sort({ submittedAt: -1 });
+            .sort({ createdAt: -1 });
 
         res.json({
             success: true,
@@ -174,7 +175,7 @@ exports.getRegistrationsByStatus = async (req, res) => {
 
         const registrations = await Registration.find({ status })
             .populate('user', '-password')
-            .sort({ submittedAt: -1 });
+            .sort({ createdAt: -1 });
         
         res.json({
             success: true,
@@ -196,6 +197,27 @@ exports.getRegistrationsByStatus = async (req, res) => {
 exports.updateRegistrationStatus = async (req, res) => {
     try {
         const { status } = req.body;
+
+        const oldReg = await Registration.findById(req.params.id);
+        const course = await Course.findById(oldReg.courseId);
+        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+
+        const wasApproved = oldReg.status === 'approved';
+        const willBeApprove = status === 'approved';
+        const wasApprovedNowNot = wasApproved && status !== 'approved';
+
+        if (!wasApproved && willBeApprove) {
+            course.enrolledCount += 1;
+        } else if (wasApprovedNowNot) {
+            course.enrolledCount -= 1;
+        }
+
+        if (course.capacity !== null && course.enrolledCount >= course.capacity) {
+            course.status = 'full';
+        } else if (course.status === 'full' && course.capacity !== null && course.enrolledCount < course.capacity) {
+            course.status = 'open';
+        }
+        await course.save();
 
         const registration = await Registration.findByIdAndUpdate(
             req.params.id,
@@ -270,7 +292,7 @@ exports.exportToExcel = async (req, res) => {
 
         const registrations = await Registration.find({ courseId })
             .populate('user', '-password')
-            .sort({ submittedAt: -1 });
+            .sort({ createdAt: -1 });
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Registrations');
@@ -297,7 +319,7 @@ exports.exportToExcel = async (req, res) => {
         registrations.forEach((reg, index) => {
             worksheet.addRow({
                 no: index + 1,
-                date: new Date(reg.submittedAt).toLocaleDateString('th-TH'),
+                date: new Date(reg.createdAt).toLocaleDateString('th-TH'),
                 title: reg.user.title,
                 firstName: reg.user.firstName,
                 lastName: reg.user.lastName,
@@ -378,3 +400,20 @@ exports.getRegistrationById = async (req, res) => {
     });
   }
 };
+
+exports.getSignedUrl = async (req, res) => {
+    try {
+        const { publicId, resourceType = 'image' } = req.query;
+
+        const signedUrl = cloudinary.url(publicId, {
+            secure: true,
+            sign_url: true,
+            expires_at: Math.floor(Date.now() / 1000) + 300,
+            resource_type: resourceType
+        });
+
+        res.json({ success: true, url: signedUrl });
+    } catch(err) {
+        res.status(500).json({ success: false, message: 'Failed to generate signed URL'});
+    }
+}

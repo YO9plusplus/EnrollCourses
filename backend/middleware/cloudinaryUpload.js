@@ -30,7 +30,7 @@ const storage = new CloudinaryStorage({
             allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
             resourceType: resourceType,
             format: format,
-            public_id: `${file.filedname}-${Date.now()}`
+            public_id: `${file.fieldname}-${Date.now()}`
         }
     }
 });
@@ -55,4 +55,19 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-module.exports = { upload, cloudinary };
+const courseImageStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'course-images',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 800, height: 600, crop: 'fill' }],
+  }
+});
+
+const uploadCourseImage = multer({
+  storage: courseImageStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: fileFilter,
+});
+
+module.exports = { upload, cloudinary, uploadCourseImage };

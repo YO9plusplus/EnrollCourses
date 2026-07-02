@@ -14,16 +14,26 @@ const AdminDashboard = () => {
     const [registrations, setRegistrations] = useState([]);
     const [filteredRegistrations, setFilteredRegistrations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState(null);
     const [stats, setStats] = useState({
         total: 0,
         pending: 0,
         approved: 0,
         rejected: 0
     });
+    const [updatingId, setUpdatingId] = useState(null);
+    const [courses, setCourses] = useState([]);
+
+
 
     const handleViewDetails = (registration) => {
         setSelectedRegistration(registration);
         setShowModal(true);
+    };
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
     };
 
     const handleCloseModal = () => {
@@ -46,6 +56,7 @@ const AdminDashboard = () => {
     // Fetch all registrations
     useEffect(() => {
         fetchRegistrations();
+        fetchCourses();
     }, []);
 
     const fetchRegistrations = async () => {
@@ -60,9 +71,18 @@ const AdminDashboard = () => {
             }
         } catch(error) {
             console.error('Error fetching registrations: ', error);
-            alert('ไม่สามารถโหลดข้อมูลได้');
+            showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchCourses = async () => {
+        try {
+            const response = await api.get('/courses');
+            if (response.data.success) setCourses(response.data.courses);
+        } catch (err) {
+            console.error('Error fetching courses:', err);
         }
     };
 
@@ -81,7 +101,7 @@ const AdminDashboard = () => {
 
         // Filter by course
         if (selectedCourse !== 'all') {
-            filtered = filtered.filter(r => r.courseId === selectedCourse);
+            filtered = filtered.filter(r => r.courseId?.formType === selectedCourse);
         }
 
         // Filter by status
@@ -106,6 +126,7 @@ const AdminDashboard = () => {
     }, [selectedCourse, selectedStatus, searchTerm, registrations]);
 
     const handleStatusChange = async (registrationId, newStatus) => {
+        setUpdatingId(registrationId);
         try {
             const response = await api.put(`/registrations/admin/${registrationId}/status`, {
                 status: newStatus
@@ -113,18 +134,20 @@ const AdminDashboard = () => {
 
             if (response.data.success) {
                 // Update local state
-                setRegistrations(prev =>
-                    prev.map(reg =>
-                        reg._id === registrationId
-                            ? { ...reg, status: newStatus }
-                            : reg
-                    )
+                const updated = registrations.map(reg =>
+                    reg._id === registrationId
+                        ? { ...reg, status: newStatus }
+                        : reg
                 );
-                alert('อัพเดตสถานะสำเร็จ');
+                setRegistrations(updated);
+                calculateStats(updated);
+                showToast('อัพเดตสถานะสำเร็จ');
             }
         } catch(error) {
             console.error('Error updating status:', error);
-            alert('ไม่สามารถอัพเดตสถานะได้');
+            showToast('ไม่สามารถอัพเดตสถานะได้', 'error');
+        } finally {
+            setUpdatingId(null);
         }
     };
 
@@ -143,7 +166,7 @@ const AdminDashboard = () => {
             link.remove();
         } catch(error) {
             console.error('Export error:', error);
-            alert('ไม่สามารถแปลงไฟล์เป็น excel ได้');
+            showToast('ไม่สามารถแปลงไฟล์เป็น excel ได้', 'error');
         }
     }
 
@@ -169,11 +192,9 @@ const AdminDashboard = () => {
         );
     };
 
-    const getCourseTitle = (courseId) => {
-        return courseId === '10'
-            ? 'ลูกเสือ'
-            : 'ยุวกาชาด';
-    };
+    const getCourseTitle = (courseId) => courseId?.title ?? '-';
+
+    const getCourseIdByFormType = (ft) => courses.find(c => c.formType === ft)?._id;
 
     if (loading) {
         return (
@@ -243,8 +264,9 @@ const AdminDashboard = () => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
                 >
                     <option value="all">ทั้งหมด</option>
-                    <option value="10">ลูกเสือ</option>
-                    <option value="11">ยุวกาชาด</option>
+                    {courses.map(c => (
+                        <option key={c._id} value={c._id}>{c.title}</option>
+                    ))}
                 </select>
                 </div>
 
@@ -269,13 +291,13 @@ const AdminDashboard = () => {
             {/* Export Buttons */}
             <div className="mt-4 flex gap-4">
                 <button
-                onClick={() => handleExport('10')}
+                onClick={() => handleExport(getCourseIdByFormType('scout'))}
                 className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                 📥 ส่งออก Excel (ลูกเสือ)
                 </button>
                 <button
-                onClick={() => handleExport('11')}
+                onClick={() => handleExport(getCourseIdByFormType('redcross'))}
                 className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                 📥 ส่งออก Excel (ยุวกาชาด)
@@ -320,7 +342,7 @@ const AdminDashboard = () => {
                     filteredRegistrations.map((registration) => (
                         <tr key={registration._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(registration.submittedAt).toLocaleDateString('th-TH')}
+                            {new Date(registration.createdAt).toLocaleDateString('th-TH')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
@@ -343,29 +365,23 @@ const AdminDashboard = () => {
                             {getStatusBadge(registration.status)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <div className="flex gap-2">
-                            {registration.status === 'pending' && (
-                                <>
-                                <button
-                                    onClick={() => handleStatusChange(registration._id, 'approved')}
-                                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                            <div className="flex gap-2 items-center">
+                                <select
+                                    value={registration.status}
+                                    onChange={(e) => handleStatusChange(registration._id, e.target.value)}
+                                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
                                 >
-                                    อนุมัติ
-                                </button>
+                                    <option value="pending">รอดำเนินการ</option>
+                                    <option value="approved">อนุมัติ</option>
+                                    <option value="rejected">ไม่อนุมัติ</option>
+                                    <option value="completed">เสร็จสิ้น</option>
+                                </select>
                                 <button
-                                    onClick={() => handleStatusChange(registration._id, 'rejected')}
-                                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                    onClick={() => handleViewDetails(registration)}
+                                    className="px-3 py-1 ml-auto cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                 >
-                                    ไม่อนุมัติ
+                                    ดูรายละเอียด
                                 </button>
-                                </>
-                            )}
-                            <button
-                                onClick={() => handleViewDetails(registration)}
-                                className="px-3 py-1 cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                            >
-                                ดูรายละเอียด
-                            </button>
                             </div>
                         </td>
                         </tr>
@@ -383,6 +399,12 @@ const AdminDashboard = () => {
                 onClose={handleCloseModal}
                 onStatusChange={handleStatusChange}
             />
+
+            {toast && (
+                <div className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm transition-all ${toast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
+                    {toast.message}
+                </div>
+            )}
     </AdminLayout>
   );
 }

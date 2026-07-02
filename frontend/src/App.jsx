@@ -5,6 +5,7 @@ import DetailPage from './pages/DetailPage'
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminCoursePage from './pages/AdminCoursePage';
 import MyRegistrationPage from './pages/MyRegistrationPage';
 import EditProfilePage from './pages/EditProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -19,6 +20,7 @@ function App() {
 
           <Route path="detail/:id" element={<ProtectedRoute><DetailPage /></ProtectedRoute>} />
           <Route path='/admin/dashboard' element={<ProtectedRoute adminOnly={true}><AdminDashboard /></ProtectedRoute>} />
+          <Route path='/admin/courses' element={<AdminCoursePage />} />
           <Route path='/my-registrations' element={<ProtectedRoute><MyRegistrationPage /></ProtectedRoute>} />
           <Route path='/profile/edit' element={ <ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         </Routes>

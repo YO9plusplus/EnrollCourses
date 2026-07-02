@@ -1,4 +1,5 @@
 import React from 'react';
+import api from '../utils/api';
 
 const RegistrationDetailModal = ({
     registration,
@@ -44,6 +45,17 @@ const RegistrationDetailModal = ({
         onClose();
     };
 
+    const handleOpenFile = async (filepath) => {
+        const publicId = filepath.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
+        const resourceType = filepath.includes('/raw/') ? 'raw' : 'image';
+
+        const res = await api.get('/registrations/admin/signed-url', {
+            params: { publicId, resourceType }
+        });
+
+        window.open(res.data.url, '_blank');
+    }
+
     return (
         <div 
             className="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -72,7 +84,7 @@ const RegistrationDetailModal = ({
                             <div className="text-right">
                                 <span className="text-sm text-gray-600">วันที่สมัคร:</span>
                                 <div className="mt-1 font-medium">
-                                    {new Date(registration.submittedAt).toLocaleDateString('th-TH', {
+                                    {new Date(registration.createdAt).toLocaleDateString('th-TH', {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',
@@ -133,15 +145,13 @@ const RegistrationDetailModal = ({
                             ].map((doc, idx) => (
                                 doc.file?.filepath && (
                                     <div key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded border">
-                                        <span className="text-sm text-gray-700">📄 {doc.label}</span>
-                                        <a 
-                                            href={doc.file.filepath}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                    <span className="text-sm text-gray-700">📄 {doc.label}</span>
+                                        <button 
+                                            onClick={() => handleOpenFile(doc.file.filepath)}
+                                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm transition-colors"
                                         >
                                             เปิดไฟล์
-                                        </a>
+                                        </button>
                                     </div>
                                 )
                             ))}
@@ -151,22 +161,6 @@ const RegistrationDetailModal = ({
 
                 {/* Footer */}
                 <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t rounded-b-lg">
-                    {registration.status === 'pending' && (
-                        <>
-                            <button
-                                onClick={handleApprove}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                            >
-                                อนุมัติ
-                            </button>
-                            <button
-                                onClick={handleReject}
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                            >
-                                ไม่อนุมัติ
-                            </button>
-                        </>
-                    )}
                     <button
                         onClick={onClose}
                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
