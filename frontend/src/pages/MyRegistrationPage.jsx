@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import api from '../utils/api';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { getSubCourseLabel } from "../config/fixedSubCourses";
 
 const statusConfig = {
 	pending: { label: 'รอการพิจารณา', color: 'bg-yellow-100 text-yellow-800'},
 	approved: { label: 'อนุมัติแล้ว', color: 'bg-green-100 text-green-800'},
 	rejected: { label: 'ไม่ผ่านการพิจารณา', color: 'bg-red-100 text-red-800'},
-	complete: { label: 'เสร็จสิ้น', color: 'bg-blue-100 text-blue-800'},
+	completed: { label: 'เสร็จสิ้น', color: 'bg-blue-100 text-blue-800'},
 };
 
 export default function MyRegistrationPage() {
 	const [registrations, setRegistrations] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+    const [requestingFor, setRequestingFor] = useState(null);
+    const [evidenceFile, setEvidenceFile] = useState(null);
 
 	useEffect(() => {
 		const fetchRegistrations = async () => {
@@ -28,6 +31,27 @@ export default function MyRegistrationPage() {
 		};
 		fetchRegistrations();
 	}, []);
+
+    const handleRequestLevel = async (registrationId) => {
+        if (!evidenceFile) {
+            alert('กรุณาแนบรูปภาพหลักฐานก่อน');
+		    return;
+        }
+        try {
+            const formData = new FormData();
+            formData.append('registrationId', registrationId);
+            formData.append('evidenceImage', evidenceFile);
+
+            await api.post('/academic-level-requests', { registrationId });
+            alert('ส่งคำขอปรับวิทยฐานะสำเร็จ รอการอนุมัติจากผู้ดูแล');
+            setRequestingFor(null);
+            setEvidenceFile(null);
+            const res = await api.get('/registrations/my-registration');
+            setRegistrations(res.data.registrations);
+        } catch(err) {
+            alert('เกิดข้อผิดพลาด: ' + (err.response?.data?.message || 'ไม่สามารถส่งคำขอได้'));
+        }
+    }
 
 	if (loading) return <div>กำลังโหลด...</div>;
 	if (error) return <div>{error}</div>
@@ -92,7 +116,7 @@ export default function MyRegistrationPage() {
                                             {reg.courseId?.title ?? reg.courseType}
                                         </h2>
                                         <p className="text-sm text-gray-500">
-                                            {reg.courseType}
+                                            {getSubCourseLabel(reg.courseType)}
                                         </p>
                                         <p className="text-xs text-gray-400 mt-1">
                                             สมัครเมื่อ: {new Date(reg.createdAt).toLocaleDateString('th-TH', {
@@ -108,6 +132,54 @@ export default function MyRegistrationPage() {
                                             </div>
                                         )}
                                     </div>
+
+                                    {reg.status === 'completed' && reg.courseId?.grantsAcademicLevel && (
+                                        <div className="mt-3">
+                                            {!reg.academicLevelRequestStatus && (
+                                                requestingFor === reg._id ? (
+                                                    <div className="flex flex-col gap-2">
+                                                        <input
+                                                            type="file"
+                                                            accept=".jpg,.jpeg,.png"
+                                                            onChange={e => setEvidenceFile(e.target.files[0] || null)}
+                                                            className="text-sm"
+                                                        />
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => handleRequestLevel(reg._id)}
+                                                                disabled={!evidenceFile}
+                                                                className="text-sm bg-[#2d6e5e] text-white px-4 py-1.5 rounded-lg hover:bg-[#1f5045] disabled:opacity-50 cursor-pointer"
+                                                            >
+                                                                ยืนยันส่งคำขอ
+                                                            </button>
+                                                            <button
+                                                                onClick={() => { setRequestingFor(null); setEvidenceFile(null); }}
+                                                                className="text-sm text-gray-500 hover:underline cursor-pointer"
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => setRequestingFor(reg._id)}
+                                                        className="text-sm bg-[#2d6e5e] text-white px-4 py-1.5 rounded-lg hover:bg-[#1f5045] transition-colors cursor-pointer"
+                                                    >
+                                                        ขอปรับวิทยฐานะเป็น {reg.courseId.grantsAcademicLevel}
+                                                    </button>
+                                                )
+                                            )}
+                                            {reg.academicLevelRequestStatus === 'pending' && (
+                                                <span className="text-sm text-yellow-700">⏳ รอการอนุมัติปรับวิทยฐานะเป็น {reg.courseId.grantsAcademicLevel}</span>
+                                            )}
+                                            {reg.academicLevelRequestStatus === 'approved' && (
+                                                <span className="text-sm text-green-700">✓ อนุมัติปรับวิทยฐานะเป็น {reg.courseId.grantsAcademicLevel} แล้ว</span>
+                                            )}
+                                            {reg.academicLevelRequestStatus === 'rejected' && (
+                                                <span className="text-sm text-red-700">คำขอปรับวิทยฐานะถูกปฏิเสธ</span>
+                                            )}
+                                        </div>
+                                    )}
 
                                     {/* Status Badge */}
                                     <div className="flex-shrink-0">

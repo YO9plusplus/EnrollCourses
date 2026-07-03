@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import RegistrationDetailModal from "../components/RegistrationDetailModal";
 import api from '../utils/api';
 import AdminLayout from '../components/AdminLayout';
+import AcademicLevelRequestsPanel from "../components/AcademicLevelRequestsPanel";
+import { getSubCourseLabel } from "../config/fixedSubCourses";
 
 const AdminDashboard = () => {
     const { user, isAuthenticated } = useAuth();
@@ -305,6 +307,8 @@ const AdminDashboard = () => {
             </div>
             </div>
 
+            <AcademicLevelRequestsPanel />
+
             {/* Registrations Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
@@ -358,7 +362,7 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4 text-sm text-gray-900">
                             <div className="font-medium">{getCourseTitle(registration.courseId)}</div>
                             <div className="text-xs text-gray-500">
-                            {registration.courseType}
+                            {getSubCourseLabel(registration.courseType)}
                             </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

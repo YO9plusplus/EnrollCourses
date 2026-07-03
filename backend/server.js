@@ -18,6 +18,7 @@ const globalLimiter = rateLimit({
 const authRoutes = require('./routes/auth');
 const registrationRoutes = require('./routes/registration');
 const courseRoutes = require('./routes/course');
+const academicLevelRequestRoutes = require('./routes/academicLevelRequest');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -40,6 +41,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/academic-level-requests', academicLevelRequestRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

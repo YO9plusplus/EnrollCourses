@@ -13,6 +13,7 @@ const EMPTY_FORM = {
     dates: [],
 	formType: '',
 	subCourses: [],
+	grantsAcademicLevel: '',
 };
 
 const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
@@ -39,6 +40,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				dates: sortedDates,
 				formType: course.formType || '',
 				subCourses: course.subCourses || [],
+				grantsAcademicLevel: course.grantsAcademicLevel || '',
 			});
 
 			if (sortedDates.length > 0) {
@@ -116,6 +118,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 
 			if (form.formType) data.append('formType', form.formType);
 			if (imageFile) data.append('image', imageFile);
+			if (form.grantsAcademicLevel) data.append('grantsAcademicLevel', form.grantsAcademicLevel);
 
 			data.append('subCourses', JSON.stringify(
 				form.subCourses.filter(sc => sc.value && sc.label)
@@ -270,7 +273,23 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 						</select>
 						<p className="text-xs text-gray-400 mt-1">กำหนดว่าฟอร์มสมัครจะแสดง field ชุดไหน</p>
 					</div>
-					
+
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-1">ผลลัพธ์วิทยฐานะเมื่อสำเร็จ (ถ้ามี)</label>
+						<select
+							value={form.grantsAcademicLevel}
+							onChange={e => setForm(p => ({ ...p, grantsAcademicLevel: e.target.value }))}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+						>
+							<option value="">ไม่เกี่ยวข้องกับวิทยฐานะ</option>
+							<option value="ชำนาญการ">ชำนาญการ</option>
+							<option value="ชำนาญการพิเศษ">ชำนาญการพิเศษ</option>
+							<option value="เชี่ยวชาญ">เชี่ยวชาญ</option>
+							<option value="เชี่ยวชาญพิเศษ">เชี่ยวชาญพิเศษ</option>
+						</select>
+						<p className="text-xs text-gray-400 mt-1">ถ้าตั้งค่านี้ไว้ ผู้สมัครที่สถานะเป็น "เสร็จสิ้น" จะขอปรับวิทยฐานะได้</p>
+					</div>
+										
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">หลักสูตรย่อย</label>
 

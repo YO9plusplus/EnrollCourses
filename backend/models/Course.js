@@ -54,6 +54,12 @@ const courseSchema = new mongoose.Schema({
 		default: null,
 	},
 
+	grantsAcademicLevel: {
+		type: String,
+		enum: ['ชำนาญการ', 'ชำนาญการพิเศษ', 'เชี่ยวชาญ', 'เชี่ยวชาญพิเศษ', null],
+		default: null,
+	}
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Course', courseSchema);

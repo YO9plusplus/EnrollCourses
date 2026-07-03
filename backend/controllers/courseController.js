@@ -18,6 +18,7 @@ exports.createCourse = async (req, res) => {
             capacity: req.body.capacity ? Number(req.body.capacity) : null,
             formType: req.body.formType || null,
             subCourses: req.body.subCourses ? JSON.parse(req.body.subCourses) : [],
+			grantsAcademicLevel: req.body.grantsAcademicLevel || null,
         });
 
         await courseData.save();
@@ -108,6 +109,7 @@ exports.updateCourse = async (req, res) => {
 			status: req.body.status,
 			formType: req.body.formType || null,
 			capacity: req.body.capacity ? Number(req.body.capacity) : null,
+			grantsAcademicLevel: req.body.grantsAcademicLevel || null,
 		};
 		if (dates?.length) updateData.dates = dates;
 		if (req.file?.path) {

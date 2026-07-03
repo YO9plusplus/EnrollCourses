@@ -98,14 +98,25 @@ exports.createRegistration = async (req, res) => {
 // @access  Private
 exports.getMyRegistrations = async (req, res) => {
     try {
+        const AcademicLevelRequest = require('../models/AcademicLevelRequest');
+
         const registrations = await Registration.find({ user: req.user.id })
-            .populate('courseId', 'title formType')
+            .populate('courseId', 'title formType grantsAcademicLevel')
             .sort({ createdAt: -1 });
+
+        const levelRequests = await AcademicLevelRequest.find({ user: req.user.id });
+
+        const registrationsWithStatus = registrations.map(reg => {
+            const obj = reg.toObject();
+            const match = levelRequests.find(r => r.registration.toString() === reg._id.toString());
+            obj.academicLevelRequestStatus = match ? match.status : null;
+            return obj;
+        });
         
             res.json({
                 success: true,
-                count: registrations.length,
-                registrations
+                count: registrationsWithStatus.length,
+                registrations: registrationsWithStatus
             });
     } catch(err) {
         console.error('Get my registrations error:', err);
