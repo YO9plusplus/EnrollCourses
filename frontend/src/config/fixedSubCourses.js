@@ -12,10 +12,3 @@ export const fixedSubCourses = {
     { value: 'rcy-manager', label: 'หลักสูตรผู้บริหารงานยุวกาชาด', requirement: 'ผ่านการอบรมหลักสูตรผู้นำยุวกาชาดมาแล้ว (ยกเว้นเป็นผู้บริหารสถานศึกษา)' },
   ],
 };
-
-export const rcyPrerequisties = {
-	'rcy-teacher': { mustNotHave: ['rcy-teacher'] },
-	'rcy-leader': { mustHaveOneOf: ['rcy-teacher'] },
-	'rcy-trainer': { mustHaveOneOf: ['rcy-leader', 'rcy-manager'] },
-	'rcy-manager': { mustHaveOneOf: ['rcy-leader'], exceptionKeyword: 'ผู้บริหารสถานศึกษา' }
-};

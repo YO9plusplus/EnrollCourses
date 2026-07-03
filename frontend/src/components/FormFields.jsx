@@ -1,7 +1,7 @@
 // Work Info Fields
 import { useState, useEffect } from 'react';
 import { bangkokDistricts, bangkokSchools } from '../data/bangkokSchools';
-import { rcyPrerequisties, fixedSubCourses } from '../config/fixedSubCourses';
+import { fixedSubCourses } from '../config/fixedSubCourses';
 
 export const CourseSelectionField = ({ options, formData, handleChange }) => (
   <div className="bg-blue-50 p-4 rounded-lg">
@@ -756,29 +756,11 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPos
     });
   };
 
-  const prereq = rcyPrerequisties[formData.courseType];
-  const isException = prereq?.exceptionKeyword && userPosition?.includes(prereq.exceptionKeyword);
-
-  let warningMessage = null;
-  if (prereq && !isException) {
-    if (prereq.mustNotHave?.includes(formData.previousTrainingCourse) && formData.hasPreviousTraining) {
-      warningMessage = 'คุณเคยผ่านการอบรมหลักสูตรนี้มาแล้ว หลักสูตรที่เลือกสมัครกำหนดว่าต้องยังไม่เคยผ่านมาก่อน';
-    } else if (prereq.mustHaveOneOf && (!formData.hasPreviousTraining || !prereq.mustHaveOneOf.includes(formData.previousTrainingCourse))) {
-      warningMessage = 'ข้อมูลที่กรอกยังไม่ตรงกับคุณสมบัติที่หลักสูตรนี้กำหนด กรุณาตรวจสอบอีกครั้งก่อนสมัคร';
-    }
-  }
-
   return (
     <>
       {/* Previous Training Experience Section */}
       <div className="border-t pt-4">
         <h4 className="font-semibold text-lg text-gray-800 mb-4">ประสบการณ์การฝึกอบรม</h4>
-
-        {warningMessage && (
-          <div className="mb-3 bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm rounded-lg p-3">
-            ⚠️ {warningMessage}
-          </div>
-        )}
 
         <div className="mb-3">
           <label className="flex items-center">
@@ -792,6 +774,23 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPos
             <span className="text-gray-700">ผ่านการฝึกอบรมยุวกาชาดมาก่อน</span>
           </label>
         </div>
+
+        {formData.courseType === 'rcy-manager' && (
+          <div className="mb-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="hasSchoolAdminRole"
+                checked={formData.hasSchoolAdminRole || false}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <span className="text-gray-700 text-sm">
+                ยืนยันว่าปัจจุบันดำรงตำแหน่งผู้บริหารสถานศึกษา
+              </span>
+            </label>
+          </div>
+        )}
 
         {formData.hasPreviousTraining && (
           <>
