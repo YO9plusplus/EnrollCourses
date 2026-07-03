@@ -167,7 +167,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">รูปภาพ</label>
                         {course?.image && !imageFile && (
-                            <img src={optimizeImage(course.image, 600)} alt="current" loading="lazy" className="h-24 object-cover rounded mb-2" />
+                            <img src={optimizeImage(course.image, 600)} alt="current" className="h-24 object-cover rounded mb-2" />
                         )}
                         <input
                             type="file"

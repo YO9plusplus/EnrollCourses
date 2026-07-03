@@ -30,8 +30,11 @@ exports.createCourse = async (req, res) => {
 };
 
 exports.getAllCourses = async (req, res) => {
-	try {
-		const courses = await Course.find().sort({ _id: -1 });
+	try {		
+		const { fields } = req.query;
+		const projection = fields === 'list' ? 'title image dates status' : '';
+		
+		const courses = await Course.find().select(projection).sort({ _id: -1 });
 
 		if (!courses) {
 			return res.status(404).json({

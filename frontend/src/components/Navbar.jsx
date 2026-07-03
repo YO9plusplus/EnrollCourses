@@ -25,7 +25,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Left side - Logo and Title */}
           <div className="flex items-center gap-4 ml-4">
-            <img src={logo} alt="Logo" loading="lazy" className="h-12 w-auto cursor-pointer" onClick={handleHome} />
+            <img src={logo} alt="Logo" className="h-12 w-auto cursor-pointer" onClick={handleHome} />
             <h2 className="text-(--thai-green) text-2xl font-bold relative top-1">สถาบันพัฒนาข้าราชการครูและบุคลากรทางการศึกษากรุงเทพมหานคร</h2>
           </div>
 

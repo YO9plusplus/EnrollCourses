@@ -12,7 +12,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await api.get('/courses');
+        const res = await api.get('/courses?fields=list');
         setCourses(res.data.courses);
       } catch(err) {
         setError('ไม่สามารถโหลดข้อมูลได้');

@@ -110,7 +110,7 @@ const AdminCoursePage = () => {
                             <tr key={course._id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <img src={optimizeImage(course.image, 600)} loading="lazy" alt={course.title} className="w-12 h-12 object-cover rounded" />
+                                        <img src={optimizeImage(course.image, 600)} alt={course.title} className="w-12 h-12 object-cover rounded" />
                                         <div>
                                             <div className="font-medium text-gray-900">{course.title}</div>
                                             <div className="text-xs text-gray-400">{course.formType}</div>
