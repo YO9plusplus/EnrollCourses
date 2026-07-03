@@ -20,6 +20,8 @@ const registrationRoutes = require('./routes/registration');
 const courseRoutes = require('./routes/course');
 
 const app = express();
+app.set('trust proxy', 1);
+app.use(globalLimiter);
 
 app.use(globalLimiter);
 app.use(cors({
