@@ -46,6 +46,7 @@ const courseSchema = new mongoose.Schema({
 		label: { type: String, required: true },
 		duration: { type: String },
 		requirement: { type: String },
+		dates: [Date],
 	}],
 
 	formType: {

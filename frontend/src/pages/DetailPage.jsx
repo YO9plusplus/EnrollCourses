@@ -185,7 +185,7 @@ const DetailPage = () => {
                     {/* Course Selection */}
                     {course.subCourses?.length > 0 && (
                       <CourseSelectionField
-                        options={config.subCourses}
+                        options={course.subCourses}
                         formData={formData}
                         handleChange={handleChange}
                       />
@@ -196,6 +196,7 @@ const DetailPage = () => {
                       <ExtraFieldsComponent
                         formData={formData}
                         handleChange={handleChange}
+                        userPosition={user?.position}
                       />
                     )}
 

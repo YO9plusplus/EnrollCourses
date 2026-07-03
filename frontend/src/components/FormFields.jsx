@@ -1,6 +1,7 @@
 // Work Info Fields
 import { useState, useEffect } from 'react';
 import { bangkokDistricts, bangkokSchools } from '../data/bangkokSchools';
+import { rcyPrerequisties, fixedSubCourses } from '../config/fixedSubCourses';
 
 export const CourseSelectionField = ({ options, formData, handleChange }) => (
   <div className="bg-blue-50 p-4 rounded-lg">
@@ -740,7 +741,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
 };
 
 // Red Cross Previous Training Fields
-export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
+export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPosition }) => {
   const handleFileChange = (e) => {
     const { name } = e.target;
     const file = e.target.files[0];
@@ -755,12 +756,30 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
     });
   };
 
+  const prereq = rcyPrerequisties[formData.courseType];
+  const isException = prereq?.exceptionKeyword && userPosition?.includes(prereq.exceptionKeyword);
+
+  let warningMessage = null;
+  if (prereq && !isException) {
+    if (prereq.mustNotHave?.includes(formData.previousTrainingCourse) && formData.hasPreviousTraining) {
+      warningMessage = 'คุณเคยผ่านการอบรมหลักสูตรนี้มาแล้ว หลักสูตรที่เลือกสมัครกำหนดว่าต้องยังไม่เคยผ่านมาก่อน';
+    } else if (prereq.mustHaveOneOf && (!formData.hasPreviousTraining || !prereq.mustHaveOneOf.includes(formData.previousTrainingCourse))) {
+      warningMessage = 'ข้อมูลที่กรอกยังไม่ตรงกับคุณสมบัติที่หลักสูตรนี้กำหนด กรุณาตรวจสอบอีกครั้งก่อนสมัคร';
+    }
+  }
+
   return (
     <>
       {/* Previous Training Experience Section */}
       <div className="border-t pt-4">
         <h4 className="font-semibold text-lg text-gray-800 mb-4">ประสบการณ์การฝึกอบรม</h4>
-        
+
+        {warningMessage && (
+          <div className="mb-3 bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm rounded-lg p-3">
+            ⚠️ {warningMessage}
+          </div>
+        )}
+
         <div className="mb-3">
           <label className="flex items-center">
             <input
@@ -780,14 +799,17 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
               <label className="block text-gray-700 text-sm mb-2">
                 หลักสูตรที่ผ่านการฝึกอบรม
               </label>
-              <input
-                type="text"
+              <select
                 name="previousTrainingCourse"
                 value={formData.previousTrainingCourse}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-                placeholder="เช่น หลักสูตรครูผู้สอนกิจกรรมยุวกาชาด"
-              />
+              >
+                <option value="">-- เลือกหลักสูตร --</option>
+                {fixedSubCourses.redcross.map(c => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
             </div>
 
             <div className="mb-3">
@@ -818,7 +840,7 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
               />
             </div>
 
-            <div>
+            <div className="mb-3">
               <label className="block text-gray-700 text-sm mb-2">
                 ระหว่างวันที่
               </label>
@@ -831,6 +853,28 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
                 placeholder="เช่น 1-7 มกราคม 2568"
               />
             </div>
+
+            {/* File Upload - Certificate copy */}
+            <div className="mb-3">
+              <label className="block text-gray-700 text-sm mb-2">
+                สำเนาวุฒิบัตร (PDF หรือรูปภาพ)
+              </label>
+              <input
+                type="file"
+                name="trainingEvidence"
+                onChange={handleFileChange}
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+              />
+              {formData.trainingEvidence && (
+                <p className="text-xs text-green-600 mt-1">
+                  ✓ ไฟล์: {formData.trainingEvidence.name}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                รองรับไฟล์: PDF, JPG, PNG (ขนาดไม่เกิน 5MB)
+              </p>
+            </div>
           </>
         )}
       </div>
@@ -839,7 +883,6 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange }) => {
       <div className="border-t pt-4 mt-6">
         <h4 className="font-semibold text-lg text-gray-800 mb-4">เอกสารประกอบการสมัคร</h4>
 
-        {/* File Upload - Supervisor Consent */}
         <div className="mb-3">
           <label className="block text-gray-700 text-sm mb-2">
             คำยินยอมให้รับการฝึกอบรมจากผู้บังคับบัญชา <span className="text-red-500">*</span>

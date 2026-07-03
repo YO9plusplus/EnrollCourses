@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../utils/api";
 import DateRangePicker from "./DateRangePicker";
 import { optimizeImage } from "../utils/cloudinary";
+import { fixedSubCourses } from "../config/fixedSubCourses";
 
 const EMPTY_FORM = {
 	title: '',
@@ -66,6 +67,15 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 		}
 		return result;
 	};
+
+	useEffect(() => {
+		if ((form.formType === 'scout' || form.formType === 'redcross') && form.subCourses.length === 0) {
+			setForm(p => ({
+				...p,
+				subCourses: fixedSubCourses[p.formType].map(sc => ({ ...sc, dates: []}))
+			}));
+		}
+	}, [form.formType]);
 
 	const handleRangeChange = (range) => {
 		setDateRange(range);
@@ -263,58 +273,77 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 					
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">หลักสูตรย่อย</label>
-						<div className="space-y-3">
-							{form.subCourses.map((sc, i) => (
-								<div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
-									<div className="flex justify-between items-center">
-										<span className="text-sm font-medium text-gray-500">หลักสูตรย่อยที่ {i + 1}</span>
-										<button
-											type="button"
-											onClick={() => removeSubCourse(i)}
-											className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
-										>
-											ลบ
-										</button>
+
+						{(form.formType === 'scout' || form.formType === 'redcross') ? (
+							<div className="space-y-3">
+								{form.subCourses.map((sc, i) => (
+									<div key={sc.value || i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+										<p className="text-sm font-medium text-gray-700">{sc.label}</p>
+										<input
+											type="date"
+											value={sc.dates?.[0] || ''}
+											onChange={e => updateSubCourse(i, 'dates', e.target.value ? [e.target.value] : [])}
+											className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+										/>
 									</div>
-									<input
-										type="text"
-										placeholder="value เช่น สำรอง, ผู้บริหาร"
-										value={sc.value}
-										onChange={e => updateSubCourse(i, 'value', e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-									/>
-									<input
-										type="text"
-										placeholder="label ชื่อเต็มที่แสดงในฟอร์ม"
-										value={sc.label}
-										onChange={e => updateSubCourse(i, 'label', e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-									/>
-									<input
-										type="text"
-										placeholder="ระยะเวลา เช่น 5 วัน 4 คืน"
-										value={sc.duration}
-										onChange={e => updateSubCourse(i, 'duration', e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-									/>
-									<input
-										type="text"
-										placeholder="คุณสมบัติ (ถ้ามี)"
-										value={sc.requirement}
-										onChange={e => updateSubCourse(i, 'requirement', e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-									/>
+								))}
+							</div>
+						) : (
+							<>
+								<div className="space-y-3">
+									{form.subCourses.map((sc, i) => (
+										<div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+											<div className="flex justify-between items-center">
+												<span className="text-sm font-medium text-gray-500">หลักสูตรย่อยที่ {i + 1}</span>
+												<button
+													type="button"
+													onClick={() => removeSubCourse(i)}
+													className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
+												>
+													ลบ
+												</button>
+											</div>
+											<input
+												type="text"
+												placeholder="value เช่น สำรอง, ผู้บริหาร"
+												value={sc.value}
+												onChange={e => updateSubCourse(i, 'value', e.target.value)}
+												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+											/>
+											<input
+												type="text"
+												placeholder="label ชื่อเต็มที่แสดงในฟอร์ม"
+												value={sc.label}
+												onChange={e => updateSubCourse(i, 'label', e.target.value)}
+												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+											/>
+											<input
+												type="text"
+												placeholder="ระยะเวลา เช่น 5 วัน 4 คืน"
+												value={sc.duration}
+												onChange={e => updateSubCourse(i, 'duration', e.target.value)}
+												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+											/>
+											<input
+												type="text"
+												placeholder="คุณสมบัติ (ถ้ามี)"
+												value={sc.requirement}
+												onChange={e => updateSubCourse(i, 'requirement', e.target.value)}
+												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+											/>
+										</div>
+									))}
 								</div>
-							))}
-						</div>
-						<button
-							type="button"
-							onClick={addSubCourse}
-							className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer"
-						>
-							+ เพิ่มหลักสูตรย่อย
-						</button>
-					</div>
+								<button
+									type="button"
+									onClick={addSubCourse}
+									className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer"
+								>
+									+ เพิ่มหลักสูตรย่อย
+								</button>
+							</>
+						)}
+					</div>			
 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
 

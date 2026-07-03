@@ -19,7 +19,6 @@ const CourseDetailCard = ({ course }) => {
                 <img
                     src={optimizeImage(course.image, 600)}
                     alt={course.title}
-                    loading="lazy"
                     className="w-full h-full object-cover"
                 />
             </div>
@@ -52,7 +51,6 @@ const CourseDetailCard = ({ course }) => {
                                 className="w-full h-full"
                                 style={{ border: 0 }}
                                 allowFullScreen
-                                loading="lazy"
                             />
                             {/* Overlay gradient bottom */}
                             <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-white/30 to-transparent pointer-events-none" />
