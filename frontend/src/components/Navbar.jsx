@@ -30,12 +30,12 @@ const Navbar = () => {
           </div>
 
           {/* Right side - Logout button */}
-          {isAuthenticated && user && (
+          {isAuthenticated && user ? (
             <div className="flex items-center gap-4 mr-4 mt-1">
               <span className="text-gray-700 font-medium mt-1.5">
                 สวัสดี, {user.firstName} {user.lastName}
               </span>
-              {user && user.role !== 'admin' && (
+              {user.role !== 'admin' && (
                   <>
                       <Link to="/profile/edit" className="text-[#2d6e5e] font-medium hover:text-[#1f5045] border border-[#2d6e5e] px-4 py-2 rounded-lg hover:bg-[#f0f9f7] transition-colors duration-200">
                           แก้ไขโปรไฟล์
@@ -52,7 +52,16 @@ const Navbar = () => {
                 ออกจากระบบ
               </button>
             </div>
-          )}
+        ) : (
+            <div className="flex items-center gap-4 mr-4">
+              <Link to="/login" className="text-[#2d6e5e] font-medium hover:text-[#1f5045] border border-[#2d6e5e] px-4 py-2 rounded-lg hover:bg-[#f0f9f7] transition-colors duration-200">
+                เข้าสู่ระบบ
+              </Link>
+              <Link to="/register" className="bg-[#2d6e5e] text-white px-4 py-2 rounded-lg hover:bg-[#1f5045] transition-colors duration-200">
+                สมัครสมาชิก
+              </Link>
+            </div>
+        )}
         </div>
       </div>
     </nav>
