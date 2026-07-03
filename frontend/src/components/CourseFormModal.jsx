@@ -124,7 +124,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 			if (course) {
 				await api.put(`courses/admin/${course._id}`, data); // UPDATE
 			} else {
-				await post('/courses/admin', data); // CREATE
+				await api.post('/courses/admin', data); // CREATE
 			}
 
 			onSaved();
