@@ -3,11 +3,21 @@ import CourseCard from '../components/CourseCard'
 import { useState, useEffect } from 'react'
 import api from '../utils/api'
 import CourseCalendar from '../components/CourseCalendar'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'admin') {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     const fetchCourses = async () => {
