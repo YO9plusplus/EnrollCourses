@@ -1,40 +1,40 @@
-import { useState } from "react"
-import { api_anonymous } from "../utils/api";
-import { useAuth } from "../context/AuthContext";
+import { useState } from 'react';
+import { api_anonymous } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 const FeedbackWidget = () => {
-	const { user } = useAuth();
-	const isAdmin = user?.role === 'admin';
+    const { user } = useAuth();
+    const isAdmin = user?.role === 'admin';
 
-	const [open, setOpen] = useState(null);
-	const [message, setMessage] = useState('');
-	const [submitting, setSubmitting] = useState(false);
-	const [sent, setSent] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [sent, setSent] = useState(false);
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		if (!message.trim()) return;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!message.trim()) return;
 
-		setSubmitting(true);
-		try {
-			await api_anonymous.post('/feedbacks', {
-				message,
-				path: window.location.pathname,
-			});
-			setSent(true);
-			setMessage('');
-			setTimeout(() => {
-				setSent(false);
-				setOpen(false);
-			}, 2000);
-		} catch(err) {
-			console.error('Failed to send feedback', err);
-		} finally {
-			setSubmitting(false);
-		}
-	};
+        setSubmitting(true);
+        try {
+            await api_anonymous.post('/feedbacks', {
+                message,
+                path: window.location.pathname,
+            });
+            setSent(true);
+            setMessage('');
+            setTimeout(() => {
+                setSent(false);
+                setOpen(false);
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to send feedback', err);
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
-	const buttonClass = isAdmin
+    const buttonClass = isAdmin
         ? 'bg-[#2d6e5e] text-white hover:bg-[#1f5045]'
         : 'bg-white text-[#2d6e5e] border border-[#2d6e5e] hover:bg-[#f0f9f7]';
 
@@ -42,7 +42,7 @@ const FeedbackWidget = () => {
         ? 'bg-[#2d6e5e] text-white hover:bg-[#1f5045]'
         : 'bg-white text-[#2d6e5e] border border-[#2d6e5e] hover:bg-[#f0f9f7]';
 
-	if (!open) {
+    if (!open) {
         return (
             <button
                 onClick={() => setOpen(true)}
@@ -53,7 +53,7 @@ const FeedbackWidget = () => {
         );
     }
 
-	return (
+    return (
         <div className="fixed bottom-6 left-6 z-40 bg-white rounded-xl shadow-xl border border-gray-200 w-80 p-4">
             <div className="flex justify-between items-center mb-2">
                 <h4 className="font-semibold text-gray-800 text-sm">แจ้ง Feedback (ไม่ระบุตัวตน)</h4>
