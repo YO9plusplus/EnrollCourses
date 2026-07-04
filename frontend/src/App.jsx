@@ -9,6 +9,7 @@ import AdminCoursePage from './pages/AdminCoursePage';
 import MyRegistrationPage from './pages/MyRegistrationPage';
 import EditProfilePage from './pages/EditProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
+import FeedbackWidget from './components/FeedbackWidget';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path='/my-registrations' element={<ProtectedRoute><MyRegistrationPage /></ProtectedRoute>} />
           <Route path='/profile/edit' element={ <ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         </Routes>
+        <FeedbackWidget />
     </AuthProvider>
   )
 }

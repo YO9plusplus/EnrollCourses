@@ -4,6 +4,7 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -30,4 +31,28 @@ api.interceptors.response.use(
   }
 );
 
+const api_anonymous = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+});
+
+api_anonymous.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+api_anonymous.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
+export {api_anonymous};
