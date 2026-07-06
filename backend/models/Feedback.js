@@ -1,10 +1,21 @@
 const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema({
-	message: {
+	token: { type: String, required: true, unique: true },
+	status: {
 		type: String,
-		required: true,
+		enum: ['open', 'resolved'],
+		default: 'open',
 	},
+	messages: [{
+		sender: { type: String, enum: ['user', 'admin'], required: true },
+		text: String,
+		image: {
+			filepath: String,
+			mimetype: String,
+		},
+		createdAt: { type: Date, default: Date.now },
+	}],
 	path: {
 		type: String,
 		required: true,
