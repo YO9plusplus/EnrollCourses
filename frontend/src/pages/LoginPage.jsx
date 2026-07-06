@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 import Navbar from '../components/Navbar';
+import { DEV_EMAIL } from '../config/devAccount';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -35,7 +36,9 @@ const LoginPage = () => {
 
         if (result.success) {
             // Redirect based on role
-            if (result.user.role === 'admin') {
+            if (result.user.email === DEV_EMAIL) {
+              navigate('/admin/feedbacks', { replace: true });
+            } else if (result.user.role === 'admin') {
               navigate('/admin/dashboard');
             } else {
               navigate(from);

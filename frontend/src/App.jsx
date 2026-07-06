@@ -10,6 +10,7 @@ import MyRegistrationPage from './pages/MyRegistrationPage';
 import EditProfilePage from './pages/EditProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import FeedbackWidget from './components/FeedbackWidget';
+import FeedbackAdminPage from './pages/FeedbackAdminPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="detail/:id" element={<ProtectedRoute><DetailPage /></ProtectedRoute>} />
           <Route path='/admin/dashboard' element={<ProtectedRoute adminOnly={true}><AdminDashboard /></ProtectedRoute>} />
           <Route path='/admin/courses' element={<AdminCoursePage />} />
+          <Route path='/admin/feedbacks' element={<ProtectedRoute adminOnly={true}><FeedbackAdminPage /></ProtectedRoute>} />
           <Route path='/my-registrations' element={<ProtectedRoute><MyRegistrationPage /></ProtectedRoute>} />
           <Route path='/profile/edit' element={ <ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         </Routes>

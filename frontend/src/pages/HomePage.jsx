@@ -5,6 +5,7 @@ import api from '../utils/api'
 import CourseCalendar from '../components/CourseCalendar'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { DEV_EMAIL } from '../config/devAccount'
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -14,8 +15,12 @@ const HomePage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isAuthenticated && user?.role === 'admin') {
-      navigate('/admin/dashboard', { replace: true });
+    if (isAuthenticated && user) {
+        if (user.email === DEV_EMAIL) {
+            navigate('/admin/feedbacks', { replace: true });
+        } else if (user.role === 'admin') {
+            navigate('/admin/dashboard', { replace: true });
+        }
     }
   }, [isAuthenticated, user, navigate]);
 

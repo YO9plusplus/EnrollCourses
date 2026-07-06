@@ -1,36 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api_anonymous } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { saveFeedbackToken, getFeedbackToken, getLastSeenCount, markAsSeen } from '../utils/feedbackToken';
 
 const FeedbackWidget = () => {
     const { user } = useAuth();
     const isAdmin = user?.role === 'admin';
 
     const [open, setOpen] = useState(false);
-    const [message, setMessage] = useState('');
-    const [submitting, setSubmitting] = useState(false);
-    const [sent, setSent] = useState(false);
+    const [token, setToken] = useState(getFeedbackToken());
+    const [thread, setThread] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [text, setText] = useState('');
+    const [imageFile, setImageFile] = useState(null);
+    const [sending, setSending] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!message.trim()) return;
-
-        setSubmitting(true);
+    const loadThread = async (t) => {
         try {
-            await api_anonymous.post('/feedbacks', {
-                message,
-                path: window.location.pathname,
-            });
-            setSent(true);
-            setMessage('');
-            setTimeout(() => {
-                setSent(false);
-                setOpen(false);
-            }, 2000);
+            const res = await api_anonymous.get(`/feedbacks/${t}`);
+            setThread(res.data.feedback);
+            const seen = getLastSeenCount();
+            setUnreadCount(Math.max(0, res.data.feedback.messages.length - seen));
         } catch (err) {
-            console.error('Failed to send feedback', err);
+            console.error('Failed to load feedback thread', err);
+        }
+    };
+
+    useEffect(() => {
+        if (!token) return;
+        loadThread(token);
+        const interval = setInterval(() => loadThread(token), 30000);
+        return () => clearInterval(interval);
+    }, [token]);
+
+    useEffect(() => {
+        if (open && thread) {
+            markAsSeen(thread.messages.length);
+            setUnreadCount(0);
+        }
+    }, [open, thread]);
+
+    const handleSend = async (e) => {
+        e.preventDefault();
+        if (!text.trim() && !imageFile) return;
+
+        setSending(true);
+        try {
+            const formData = new FormData();
+            formData.append('message', text);
+            formData.append('path', window.location.pathname);
+            if (imageFile) formData.append('image', imageFile);
+
+            if (!token) {
+                const res = await api_anonymous.post('/feedbacks', formData);
+                saveFeedbackToken(res.data.token);
+                setToken(res.data.token);
+                setThread(res.data.feedback);
+            } else {
+                const res = await api_anonymous.post(`/feedbacks/${token}/messages`, formData);
+                setThread(res.data.feedback);
+                markAsSeen(res.data.feedback.messages.length);
+            }
+
+            setText('');
+            setImageFile(null);
+        } catch (err) {
+            console.error('Failed to send feedback message', err);
         } finally {
-            setSubmitting(false);
+            setSending(false);
         }
     };
 
@@ -38,54 +75,62 @@ const FeedbackWidget = () => {
         ? 'bg-[#2d6e5e] text-white hover:bg-[#1f5045]'
         : 'bg-white text-[#2d6e5e] border border-[#2d6e5e] hover:bg-[#f0f9f7]';
 
-    const submitButtonClass = isAdmin
-        ? 'bg-[#2d6e5e] text-white hover:bg-[#1f5045]'
-        : 'bg-white text-[#2d6e5e] border border-[#2d6e5e] hover:bg-[#f0f9f7]';
-
     if (!open) {
         return (
             <button
                 onClick={() => setOpen(true)}
-                className={`fixed bottom-6 left-6 z-40 px-4 py-3 rounded-full shadow-lg transition-colors cursor-pointer text-sm font-medium ${buttonClass}`}
+                className={`fixed bottom-12 left-10 z-40 px-4 py-3 rounded-full shadow-lg transition-colors cursor-pointer text-sm font-medium ${buttonClass}`}
             >
                 💬 ให้ Feedback
+                {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        {unreadCount}
+                    </span>
+                )}
             </button>
         );
     }
 
     return (
-        <div className="fixed bottom-6 left-6 z-40 bg-white rounded-xl shadow-xl border border-gray-200 w-80 p-4">
-            <div className="flex justify-between items-center mb-2">
+        <div className="fixed bottom-12 left-10 z-40 bg-white rounded-xl shadow-xl border border-gray-200 w-80 flex flex-col" style={{ maxHeight: '70vh' }}>
+            <div className="flex justify-between items-center px-4 py-3 border-b">
                 <h4 className="font-semibold text-gray-800 text-sm">แจ้ง Feedback (ไม่ระบุตัวตน)</h4>
-                <button
-                    onClick={() => setOpen(false)}
-                    className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg leading-none"
-                >
-                    &times;
-                </button>
+                <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg leading-none">&times;</button>
             </div>
 
-            {sent ? (
-                <p className="text-sm text-green-600 py-4 text-center">ส่งความคิดเห็นแล้ว ขอบคุณครับ 🙏</p>
-            ) : (
-                <form onSubmit={handleSubmit}>
-                    <textarea
-                        value={message}
-                        onChange={e => setMessage(e.target.value)}
-                        rows={4}
-                        placeholder="พิมพ์ความคิดเห็นหรือปัญหาที่เจอ..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] resize-none"
-                        autoFocus
-                    />
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                {!thread && (
+                    <p className="text-xs text-gray-500">พิมพ์ปัญหาหรือความคิดเห็นด้านล่าง แล้วกดส่งได้เลยครับ</p>
+                )}
+                {thread?.messages.map((m, i) => (
+                    <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${m.sender === 'user' ? 'bg-[#2d6e5e] text-white' : 'bg-gray-100 text-gray-800'}`}>
+                            {m.text && <p>{m.text}</p>}
+                            {m.image?.filepath && <img src={m.image.filepath} alt="แนบ" className="mt-1 rounded max-w-full max-h-48 object-contain" />}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <form onSubmit={handleSend} className="border-t p-3 space-y-2">
+                <textarea
+                    value={text}
+                    onChange={e => setText(e.target.value)}
+                    rows={2}
+                    placeholder="พิมพ์ข้อความ..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] resize-none"
+                />
+                <div className="flex items-center gap-2">
+                    <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0] || null)} className="text-xs flex-1" />
                     <button
                         type="submit"
-                        disabled={submitting || !message.trim()}
-                        className={`mt-2 w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${submitButtonClass}`}
+                        disabled={sending || (!text.trim() && !imageFile)}
+                        className="bg-[#2d6e5e] text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-[#1f5045] disabled:opacity-50 cursor-pointer"
                     >
-                        {submitting ? 'กำลังส่ง...' : 'ส่ง'}
+                        {sending ? '...' : 'ส่ง'}
                     </button>
-                </form>
-            )}
+                </div>
+            </form>
         </div>
     );
 };

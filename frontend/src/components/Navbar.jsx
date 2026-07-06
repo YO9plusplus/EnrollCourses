@@ -1,13 +1,16 @@
 import logo from '../assets/logo.png'  // Change to your actual logo filename
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
+import { DEV_EMAIL } from '../config/devAccount';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleHome = () => {
-    if (user?.role === 'admin') {
+    if (user?.email === DEV_EMAIL) {
+        navigate('/admin/feedbacks');
+    } else if (user?.role === 'admin') {
       navigate('/admin/dashboard');
     } else {
       navigate('/');
