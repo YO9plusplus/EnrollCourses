@@ -26,7 +26,6 @@ const RegisterPage = () => {
     lastName: '',
     religion: '',
     birthDate: '',
-    age: '',
     idCard: '',
     
     // Contact
@@ -205,7 +204,6 @@ const RegisterPage = () => {
               <PersonalInfoFields 
                 formData={formData} 
                 handleChange={handleChange} 
-                showAge={true}
               />
 
               {/* Contact Info */}

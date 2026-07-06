@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { bangkokDistricts, bangkokSchools } from '../data/bangkokSchools';
 import { fixedSubCourses } from '../config/fixedSubCourses';
+import { calculateAge } from '../utils/age';
 
 export const CourseSelectionField = ({ options, formData, handleChange }) => (
   <div className="bg-blue-50 p-4 rounded-lg">
@@ -37,7 +38,7 @@ export const CourseSelectionField = ({ options, formData, handleChange }) => (
   </div>
 );
 
-export const PersonalInfoFields = ({ formData, handleChange, showAge = false }) => (
+export const PersonalInfoFields = ({ formData, handleChange }) => (
   <div className="border-t pt-4">
     <h4 className="font-semibold text-lg text-gray-800 mb-4">ข้อมูลส่วนตัว</h4>
     
@@ -114,7 +115,7 @@ export const PersonalInfoFields = ({ formData, handleChange, showAge = false }) 
       </div>
     </div>
 
-    <div className={`grid ${showAge ? 'grid-cols-2' : 'grid-cols-1'} gap-3 mb-3`}>
+    <div className="grid grid-cols-1 gap-3 mb-3">
       <div>
         <label className="block text-gray-700 text-sm mb-2">
           วัน เดือน ปีเกิด <span className="text-red-500">*</span>
@@ -127,24 +128,10 @@ export const PersonalInfoFields = ({ formData, handleChange, showAge = false }) 
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
         />
+        {formData.birthDate && (
+          <p className="text-xs text-gray-500 mt-1">อายุ {calculateAge(formData.birthDate)} ปี</p>
+        )}
       </div>
-      
-      {showAge && (
-        <div>
-          <label className="block text-gray-700 text-sm mb-2">
-            อายุ (ปี) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-            placeholder="อายุ"
-          />
-        </div>
-      )}
     </div>
 
     <div>
@@ -967,5 +954,153 @@ export const AgreementField = ({ formData, handleChange }) => (
         ข้าพเจ้าทราบระเบียบและจะปฏิบัติตามกฎของการฝึกอบรมทุกประการ และสามารถเข้ารับการฝึกอบรมได้ตลอดหลักสูตร <span className="text-red-500">*</span>
       </span>
     </label>
+  </div>
+);
+
+// Academic Promotion (เลื่อนวิทยฐานะ) Fields
+export const AcademicPromotionFields = ({ formData, handleChange, user }) => (
+  <div className="border-t pt-4">
+    <h4 className="font-semibold text-lg text-gray-800 mb-4">ข้อมูลปัจจุบัน (จากโปรไฟล์)</h4>
+    <div className="grid grid-cols-2 gap-3 mb-4 text-sm bg-gray-50 rounded-lg p-3">
+      <div><span className="text-gray-500">คุณวุฒิสูงสุด:</span> <span className="font-medium">{user?.education || '-'}</span></div>
+      <div><span className="text-gray-500">วิชาเอก:</span> <span className="font-medium">{user?.major || '-'}</span></div>
+      <div><span className="text-gray-500">ตำแหน่ง:</span> <span className="font-medium">{user?.position || '-'}</span></div>
+      <div><span className="text-gray-500">วิทยฐานะปัจจุบัน:</span> <span className="font-medium">{user?.academicLevel || '-'}</span></div>
+      <div><span className="text-gray-500">สถานศึกษา:</span> <span className="font-medium">{user?.school || '-'}</span></div>
+      <div><span className="text-gray-500">อายุ:</span> <span className="font-medium">{user?.birthDate ? calculateAge(user.birthDate) : '-'} ปี</span></div>
+    </div>
+
+    <h4 className="font-semibold text-lg text-gray-800 mb-4">ข้อมูลการรับราชการ</h4>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label className="block text-gray-700 text-sm mb-2">อายุราชการ (ปี)</label>
+        <input
+          type="number"
+          name="yearsOfService"
+          value={formData.yearsOfService}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+        />
+      </div>
+    </div>
+
+    <div className="mb-3">
+      <label className="block text-gray-700 text-sm mb-2">สังกัด</label>
+      <div className="flex gap-4 flex-wrap">
+        {['สำนักงานเขต', 'สำนักการศึกษา', 'สำนักพัฒนาสังคม'].map(opt => (
+          <label key={opt} className="flex items-center">
+            <input
+              type="radio"
+              name="department"
+              value={opt}
+              checked={formData.department === opt}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <span className="text-sm">{opt}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+      <div>
+        <label className="block text-gray-700 text-sm mb-2">วันที่แต่งตั้งตำแหน่งปัจจุบัน</label>
+        <input type="date" name="positionAppointedDate" value={formData.positionAppointedDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+      </div>
+      <div>
+        <label className="block text-gray-700 text-sm mb-2">วันที่แต่งตั้งวิทยฐานะปัจจุบัน</label>
+        <input type="date" name="academicLevelAppointedDate" value={formData.academicLevelAppointedDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+      </div>
+      <div>
+        <label className="block text-gray-700 text-sm mb-2">วันที่รับราชการในตำแหน่ง/สถานศึกษาปัจจุบัน</label>
+        <input type="date" name="currentPositionSchoolDate" value={formData.currentPositionSchoolDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+      </div>
+    </div>
+
+    <div className="mb-3">
+      <label className="block text-gray-700 text-sm mb-2">สายงานที่ขอเข้ารับการพัฒนาก่อนแต่งตั้ง</label>
+      <div className="flex gap-4 flex-wrap">
+        {['การบริหารสถานศึกษา', 'การนิเทศการศึกษา', 'การสอน'].map(opt => (
+          <label key={opt} className="flex items-center">
+            <input type="radio" name="careerTrack" value={opt} checked={formData.careerTrack === opt} onChange={handleChange} className="mr-2" />
+            <span className="text-sm">{opt}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <div className="mb-3">
+      <label className="block text-gray-700 text-sm mb-2">ขอเข้ารับการพัฒนาก่อนแต่งตั้งในกรณี</label>
+      <div className="flex flex-col gap-2">
+        {['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาครบ 5 ปี'].map(opt => (
+          <label key={opt} className="flex items-center">
+            <input type="radio" name="developmentCase" value={opt} checked={formData.developmentCase === opt} onChange={handleChange} className="mr-2" />
+            <span className="text-sm">{opt}</span>
+          </label>
+        ))}
+      </div>
+
+      {formData.developmentCase === 'วุฒิบัตรการพัฒนาครบ 5 ปี' && (
+        <div className="grid grid-cols-2 gap-3 mt-2 pl-6">
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">วันที่ได้วุฒิบัตร</label>
+            <input type="date" name="developmentCaseCertDate" value={formData.developmentCaseCertDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+          </div>
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">จำนวนครั้ง</label>
+            <input type="number" name="developmentCaseCertCount" value={formData.developmentCaseCertCount} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label className="block text-gray-700 text-sm mb-2">เคยเข้ารับการฝึกอบรมโครงการฯ วิทยฐานะมาแล้ว (ครั้ง)</label>
+        <input type="number" name="previousTrainingCount" value={formData.previousTrainingCount} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+      </div>
+      <div>
+        <label className="block text-gray-700 text-sm mb-2">เคยส่งผลงานทางวิชาการมาแล้ว (ครั้ง)</label>
+        <input type="number" name="academicWorkCount" value={formData.academicWorkCount} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+      </div>
+    </div>
+
+    <div>
+      <label className="block text-gray-700 text-sm mb-2">คาดว่าจะส่งผลงานทางวิชาการ ด้านที่ 3 (ระบุกลุ่มสาระ)</label>
+      <input
+        type="text"
+        name="expectedAcademicWorkArea"
+        value={formData.expectedAcademicWorkArea}
+        onChange={handleChange}
+        placeholder="เช่น กลุ่มสาระการเรียนรู้คณิตศาสตร์"
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+      />
+    </div>
+    <div className="mt-3">
+      <label className="block text-gray-700 text-sm mb-2">
+          แนบไฟล์ใบสมัคร (ที่กรอกและลงชื่อแล้ว) <span className="text-red-500">*</span>
+      </label>
+      <input
+          type="file"
+          name="applicationForm"
+          onChange={(e) => handleChange({
+              target: {
+                  name: 'applicationForm',
+                  value: e.target.files[0],
+                  type: 'file',
+                  files: e.target.files
+              }
+          })}
+          accept=".pdf,.jpg,.jpeg,.png"
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+      />
+      {formData.applicationForm && (
+          <p className="text-xs text-green-600 mt-1">✓ ไฟล์: {formData.applicationForm.name}</p>
+      )}
+      <p className="text-xs text-gray-500 mt-1">รองรับไฟล์: PDF, JPG, PNG (ขนาดไม่เกิน 5MB)</p>
+  </div>
   </div>
 );

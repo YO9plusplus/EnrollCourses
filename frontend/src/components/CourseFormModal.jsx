@@ -270,6 +270,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 							<option value="">ไม่เปิดรับสมัครออนไลน์</option>
 							<option value="scout">ลูกเสือ (scout)</option>
 							<option value="redcross">ยุวกาชาด (redcross)</option>
+							<option value="academicPromotion">เลื่อนวิทยฐานะ</option>
 						</select>
 						<p className="text-xs text-gray-400 mt-1">กำหนดว่าฟอร์มสมัครจะแสดง field ชุดไหน</p>
 					</div>

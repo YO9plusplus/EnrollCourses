@@ -31,7 +31,6 @@ const updateProfileValidation = [
     body('lastName').optional().notEmpty().withMessage('กรุณากรอกนามสกุล'),
     body('title').optional().isIn(['นาย', 'นาง', 'นางสาว', 'อื่นๆ']),
     body('mobilePhone').optional(),
-    body('age').optional().isInt({ min: 1, max: 120 }).withMessage('อายุไม่ถูกต้อง'),
     body('idCard').optional().isLength({ max: 13 }).withMessage('เลขบัตรประชาชนไม่ถูกต้อง'),
 ];
 

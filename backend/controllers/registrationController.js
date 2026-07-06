@@ -39,6 +39,20 @@ exports.createRegistration = async (req, res) => {
             previousTrainingNumber: req.body.previousTrainingNumber,
             previousTrainingLocation: req.body.previousTrainingLocation,
             previousTrainingDate: req.body.previousTrainingDate,
+
+            // เลื่อนวิทยฐานะ
+            yearsOfService: req.body.yearsOfService ? Number(req.body.yearsOfService) : null,
+            department: req.body.department,
+            positionAppointedDate: req.body.positionAppointedDate,
+            academicLevelAppointedDate: req.body.academicLevelAppointedDate,
+            currentPositionSchoolDate: req.body.currentPositionSchoolDate,
+            careerTrack: req.body.careerTrack,
+            developmentCase: req.body.developmentCase,
+            developmentCaseCertDate: req.body.developmentCaseCertDate,
+            developmentCaseCertCount: req.body.developmentCaseCertCount ? Number(req.body.developmentCaseCertCount) : null,
+            previousTrainingCount: req.body.previousTrainingCount ? Number(req.body.previousTrainingCount) : null,
+            academicWorkCount: req.body.academicWorkCount ? Number(req.body.academicWorkCount) : null,
+            expectedAcademicWorkArea: req.body.expectedAcademicWorkArea,
         });
 
         // Handle file uploads
@@ -73,6 +87,15 @@ exports.createRegistration = async (req, res) => {
                 };
             }
             
+            if (req.files.applicationForm) {
+                const file = req.files.applicationForm[0];
+                registrationData.applicationForm = {
+                    filename: file.originalname,
+                    filepath: file.path,
+                    mimetype: file.mimetype,
+                    size: file.size,
+                };
+            }
         }
 
 

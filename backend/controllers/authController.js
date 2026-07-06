@@ -24,7 +24,6 @@ exports.register = async (req, res) => {
             title,
             religion,
             birthDate,
-            age,
             idCard,
             // Contact Info
             mobilePhone,
@@ -63,7 +62,6 @@ exports.register = async (req, res) => {
             title,
             religion,
             birthDate,
-            age,
             idCard,
             // Contact Info
             mobilePhone,
@@ -110,7 +108,6 @@ exports.register = async (req, res) => {
                 title: user.title,
                 religion: user.religion,
                 birthDate: user.birthDate,
-                age: user.age,
                 idCard: user.idCard,
                 mobilePhone: user.mobilePhone,
                 lineId: user.lineId,
@@ -265,7 +262,7 @@ exports.updateProfile = async (req, res) => {
 
         const allowedFields = [
             'firstName', 'lastName', 'title', 'religion',
-            'birthDate', 'age', 'mobilePhone', 'lineId',
+            'birthDate', 'mobilePhone', 'lineId',
             'education', 'major', 'position', 'academicLevel',
             'school', 'district', 'officePhone', 'schoolPhone',
             'healthCondition', 'foodRestrictions'

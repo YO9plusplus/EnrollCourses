@@ -60,7 +60,6 @@ const userSchema = new mongoose.Schema({
   },
   religion: String,
   birthDate: Date,
-  age: Number,
   idCard: {
     type: String,
   },

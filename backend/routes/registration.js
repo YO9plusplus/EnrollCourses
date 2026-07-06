@@ -10,6 +10,7 @@ router.post('/', auth, upload.fields([
 { name: 'trainingEvidence', maxCount: 1 },
     { name: 'supervisorConsent', maxCount: 1 },
     { name: 'medicalCertificate', maxCount: 1 },
+    { name: 'applicationForm', maxCount: 1 },
 ]), registrationController.createRegistration)
 
 router.get('/my-registration', auth, registrationController.getMyRegistrations);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { calculateAge } from '../utils/age';
 
 const TITLE_OPTIONS = ['นาย', 'นาง', 'นางสาว'];
 const RELIGION_OPTIONS = ['พุทธ', 'คริสต์', 'อิสลาม', 'อื่นๆ'];
@@ -144,7 +145,7 @@ export default function EditProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <DisplayField label="ศาสนา" value={profile?.religion} />
 						<DisplayField label="วันเกิด" value={profile?.birthDate?.split('T')[0]} />
-						<DisplayField label="อายุ" value={profile?.age} />
+						<DisplayField label="อายุ" value={profile?.birthDate ? `${calculateAge(profile.birthDate)} ปี` : '-'} />
                     </div>
 
                     <div className="mt-4">

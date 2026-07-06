@@ -41,6 +41,29 @@ const registrationSchema = new mongoose.Schema({
     previousTrainingLocation: String,
     previousTrainingDate: String,
 
+    // เลื่อนวิทยฐานะ
+    yearsOfService: Number,
+    department: {
+        type: String,
+        enum: ['สำนักงานเขต', 'สำนักการศึกษา', 'สำนักพัฒนาสังคม', '']
+    },
+    positionAppointedDate: String,
+    academeicLevelAppointedDate: String,
+    currentPositionSchoolDate: String,
+    careerTrack: {
+        type: String,
+        enum: ['การบริหารสถานศึกษา', 'การนิเทศการศึกษา', 'การสอน', '']
+    },
+    developmentCase: {
+        type: String,
+        enum: ['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาครบ 5 ปี', '']
+    },
+    developmentCaseCertDate: String,
+    developmentCaseCertCount: Number,
+    previousTrainingCount: Number,
+    academicWorkCount: Number,
+    expectedAcademicWorkArea: String,
+
     // File Uploads
     trainingEvidence: {
         filename: String,
@@ -55,6 +78,12 @@ const registrationSchema = new mongoose.Schema({
         size: Number,
     },
     medicalCertificate: {
+        filename: String,
+        filepath: String,
+        mimetype: String,
+        size: Number
+    },
+    applicationForm: {
         filename: String,
         filepath: String,
         mimetype: String,

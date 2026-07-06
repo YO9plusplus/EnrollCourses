@@ -1,4 +1,4 @@
-import { RedCrossPreviousTrainingFields, ScoutPreviousTrainingFields } from "../components/FormFields";
+import { AcademicPromotionFields, RedCrossPreviousTrainingFields, ScoutPreviousTrainingFields } from "../components/FormFields";
 
 export const formConfigs = {
   scout: {
@@ -28,9 +28,29 @@ export const formConfigs = {
     requiredFiles: [],
     optionalFiles: ['trainingEvidence'],
   },
+
+  academicPromotion: {
+    extraFields: [
+      'yearsOfService',
+      'department',
+      'positionAppointedDate',
+      'academicLevelAppointedDate',
+      'currentPositionSchoolDate',
+      'careerTrack',
+      'developmentCase',
+      'developmentCaseCertDate',
+      'developmentCaseCertCount',
+      'previousTrainingCount',
+      'academicWorkCount',
+      'expectedAcademicWorkArea',
+    ],
+    requiredFiles: [],
+    optionalFiles: [],
+  },
 };
 
 export const extraFieldComponents = {
   scout: ScoutPreviousTrainingFields,
   redcross: RedCrossPreviousTrainingFields,
+  academicPromotion: AcademicPromotionFields,
 };

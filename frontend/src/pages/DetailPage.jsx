@@ -53,6 +53,7 @@ const DetailPage = () => {
           setFormData(initialData);
         }
       } catch(err) {
+        console.log(err);
         setError('ไม่สามารถโหลดคอร์สนี้ได้');
       } finally {
         setLoading(false);
@@ -196,7 +197,7 @@ const DetailPage = () => {
                       <ExtraFieldsComponent
                         formData={formData}
                         handleChange={handleChange}
-                        userPosition={user?.position}
+                        user={user}
                       />
                     )}
 
