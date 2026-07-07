@@ -134,7 +134,7 @@ const FeedbackWidget = () => {
                             <button
                                 type="button"
                                 onClick={() => setReplyingTo({ messageId: m._id, sender: m.sender, text: m.text })}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#2d6e5e] cursor-pointer shrink-0"
+                                                                            className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#2d6e5e] cursor-pointer shrink-0"
                                 title="ตอบกลับข้อความนี้"
                             >
                                 <i className="bi bi-reply-fill"></i>
