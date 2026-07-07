@@ -35,11 +35,12 @@ const AdminLayout = ({ children }) => {
                 </Link>
               </li>
               <li>
-                <span 
-                  className='block px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed'
+                <Link
+                  to="/admin/users"
+                  className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/admin/users')}`}
                 >
-                  👥 จัดการผู้ใช้
-                </span>
+                จัดการผู้ใช้
+                </Link>
               </li>
               <li>
                 <span 

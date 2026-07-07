@@ -11,6 +11,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import FeedbackWidget from './components/FeedbackWidget';
 import FeedbackAdminPage from './pages/FeedbackAdminPage';
+import AdminUserCoursesPage from './pages/AdminUserCoursesPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path='/admin/dashboard' element={<ProtectedRoute adminOnly={true}><AdminDashboard /></ProtectedRoute>} />
           <Route path='/admin/courses' element={<AdminCoursePage />} />
           <Route path='/admin/feedbacks' element={<ProtectedRoute adminOnly={true}><FeedbackAdminPage /></ProtectedRoute>} />
+          <Route path='/admin/users' element={ <ProtectedRoute adminOnly={true}><AdminUserCoursesPage /></ProtectedRoute>}/>
           <Route path='/my-registrations' element={<ProtectedRoute><MyRegistrationPage /></ProtectedRoute>} />
           <Route path='/profile/edit' element={ <ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         </Routes>

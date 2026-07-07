@@ -451,3 +451,66 @@ exports.getSignedUrl = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to generate signed URL'});
     }
 }
+
+exports.getRegistrationsGroupedByUser = async (req, res) => {
+    try {
+        const result = await Registration.aggregate([
+            { $match: { status: 'approved' } },
+            {
+                $lookup: {
+                    from: 'courses',
+                    localField: 'courseId',
+                    foreignField: '_id',
+                    as: 'course'
+                }
+            },
+            { $unwind: '$course' },
+        {
+            $group: {
+                _id: '$user',
+                courseCount: { $sum: 1 },
+                courses: {
+                    $push: {
+                        _id: '$course._id',
+                        title: '$course.title'
+                    }
+                }
+            }
+        },
+        { $sort: { courseCount: -1 } },
+        {
+            $lookup: {
+                from: 'users',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'user'
+            }
+        },
+        { $unwind: '$user' },
+        {
+            $project: {
+                _id: 0,
+                userId: '$user._id',
+                firstName: '$user.firstName',
+                lastName: '$user.lastName',
+                email: '$user.email',
+                school: '$user.school',
+                courseCount: 1,
+                courses: 1
+            }
+        }
+        ]);
+
+        res.json({
+            success: true,
+            count: result.length,
+            users: result
+        });
+    } catch(error) {
+        console.error('Get registrations grouped by user error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get data'
+        });
+    }
+};
