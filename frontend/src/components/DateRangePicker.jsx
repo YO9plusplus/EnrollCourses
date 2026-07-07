@@ -6,7 +6,7 @@ const MONTHS_TH = [
 ];
 const DAYS_TH = ['อา','จ','อ','พ','พฤ','ศ','ส'];
 
-const DateRangePicker = ({ dateRange, onChange }) => {
+const DateRangePicker = ({ dateRange, onChange, disabled = false }) => {
     const today = new Date().toISOString().slice(0, 10);
     const now = new Date();
 
@@ -35,6 +35,7 @@ const DateRangePicker = ({ dateRange, onChange }) => {
     }
 
     const handleClick = (d) => {
+        if (disabled) return;
         if (d < today) return;
 
 		if (start && end) {
@@ -74,7 +75,7 @@ const DateRangePicker = ({ dateRange, onChange }) => {
     };
 
     return (
-        <div className="border border-gray-200 rounded-xl p-4 bg-white select-none">
+                <div className={`border border-gray-200 rounded-xl p-4 bg-white select-none ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
             {/* Header nav */}
             <div className="flex items-center justify-between mb-3">
                 <button type="button" onClick={prevMonth}

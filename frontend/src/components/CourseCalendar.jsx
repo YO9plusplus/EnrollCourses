@@ -12,12 +12,14 @@ const CourseCalendar = ({ courses }) => {
 
 	const eventsByDate = useMemo(() => {
 		const map = {};
-		courses.forEach((course) => {
-			(course.dates || []).forEach((rawDate) => {
-				const key = formatDateKey(rawDate);
-				(map[key] ||= []).push(course);
+		courses
+			.filter((course) => course.status !== 'closed')
+			.forEach((course) => {
+				(course.dates || []).forEach((rawDate) => {
+					const key = formatDateKey(rawDate);
+					(map[key] ||= []).push(course);
+				});
 			});
-		});
 		return map;
 	}, [courses]);
 

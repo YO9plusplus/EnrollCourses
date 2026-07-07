@@ -23,6 +23,10 @@ const FeedbackAdminPage = () => {
         try {
             const res = await api.get('/feedbacks/admin/all');
             setThreads(res.data.feedbacks);
+            setSelected(prev => {
+                if (!prev) return prev;
+                return res.data.feedbacks.find(t => t._id === prev._id) || prev;
+            })
         } catch (err) {
             console.error('Failed to load feedback threads', err);
         } finally {
@@ -30,7 +34,11 @@ const FeedbackAdminPage = () => {
         }
     };
 
-    useEffect(() => { fetchThreads(); }, []);
+    useEffect(() => { 
+        fetchThreads(); 
+        const interval = setInterval(fetchThreads, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handleReply = async (e) => {
         e.preventDefault();

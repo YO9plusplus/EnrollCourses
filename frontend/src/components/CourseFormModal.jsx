@@ -271,9 +271,12 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
                     </div>
 
                     {/* Dates */}
-					<div>
+										<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">ช่วงวันที่อบรม</label>
-						<DateRangePicker dateRange={dateRange} onChange={handleRangeChange} />
+						<DateRangePicker dateRange={dateRange} onChange={handleRangeChange} disabled={form.status === 'closed'} />
+						{form.status === 'closed' && (
+							<p className="text-xs text-amber-600 mt-1">ปิดรับสมัครแล้ว ไม่สามารถแก้ไขวันที่ได้</p>
+						)}
 						{form.dates.length > 0 && (
 							<div className="mt-2">
 								<p className="text-xs text-gray-500 mb-1">วันที่ทั้งหมด {form.dates.length} วัน</p>

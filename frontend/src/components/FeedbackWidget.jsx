@@ -37,7 +37,7 @@ const FeedbackWidget = () => {
     useEffect(() => {
         if (!token) return;
         loadThread(token);
-        const interval = setInterval(() => loadThread(token), 30000);
+        const interval = setInterval(() => loadThread(token), 10000);
         return () => clearInterval(interval);
     }, [token]);
 
