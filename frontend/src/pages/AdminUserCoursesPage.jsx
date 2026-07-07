@@ -76,7 +76,7 @@ const AdminUserCoursesPage = () => {
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ชื่อ-นามสกุล</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">โรงเรียน</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">จำนวนหลักสูตรที่สำเร็จ</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">จำนวนหลักสูตรที่กำลังลงสมัคร</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">รายชื่อหลักสูตร</th>
                             </tr>
                         </thead>

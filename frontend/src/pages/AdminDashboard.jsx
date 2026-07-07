@@ -103,7 +103,7 @@ const AdminDashboard = () => {
 
         // Filter by course
         if (selectedCourse !== 'all') {
-            filtered = filtered.filter(r => r.courseId?.formType === selectedCourse);
+            filtered = filtered.filter(r => r.courseId?._id === selectedCourse);
         }
 
         // Filter by status
