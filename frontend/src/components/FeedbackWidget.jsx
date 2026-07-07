@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api_anonymous } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { saveFeedbackToken, getFeedbackToken, getLastSeenCount, markAsSeen } from '../utils/feedbackToken';
@@ -15,6 +15,13 @@ const FeedbackWidget = () => {
     const [imageFile, setImageFile] = useState(null);
     const [sending, setSending] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null);
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        if (open) {
+            messagesEndRef.current?.scrollIntoView({ block: 'end' });
+        }
+    }, [open, thread]);
 
     const loadThread = async (t) => {
         try {
@@ -135,6 +142,7 @@ const FeedbackWidget = () => {
                         )}
                     </div>
                 ))}
+                <div ref={messagesEndRef} />
             </div>
 
             <form onSubmit={handleSend} className="border-t p-3 space-y-2">

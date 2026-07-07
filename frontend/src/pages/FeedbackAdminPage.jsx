@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import { getAdminUnreadCount, markAdminThreadSeen } from '../utils/feedbackToken';
@@ -11,6 +11,13 @@ const FeedbackAdminPage = () => {
     const [sending, setSending] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null);
     const [loading, setLoading] = useState(true);
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        if (selected) {
+            messagesEndRef.current?.scrollIntoView({ block: 'end' });
+        }
+    }, [selected]);
 
     const fetchThreads = async () => {
         try {
@@ -126,6 +133,7 @@ const FeedbackAdminPage = () => {
                                     )}
                                 </div>
                             ))}
+                            <div ref={messagesEndRef} />
                             </div>
                             <form onSubmit={handleReply} className="border-t pt-3 space-y-2">
                                 {replyingTo && (
