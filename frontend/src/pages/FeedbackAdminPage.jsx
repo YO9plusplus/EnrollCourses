@@ -79,6 +79,9 @@ const FeedbackAdminPage = () => {
                                         <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm ${m.sender === 'admin' ? 'bg-[#2d6e5e] text-white' : 'bg-gray-100 text-gray-800'}`}>
                                             {m.text && <p>{m.text}</p>}
                                             {m.image?.filepath && <img src={m.image.filepath} alt="แนบ" className="mt-1 rounded max-w-full max-h-48 object-contain" />}
+                                            <p className={`text-[10px] mt-1 ${m.sender === 'admin' ? 'text-white/70' : 'text-gray-400'}`}>
+                                                {new Date(m.createdAt).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}
