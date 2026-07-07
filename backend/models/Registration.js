@@ -67,6 +67,10 @@ const registrationSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    customQuestions: [{
+        key: String,
+        value: String,
+    }],
 
     // File Uploads
     trainingEvidence: {

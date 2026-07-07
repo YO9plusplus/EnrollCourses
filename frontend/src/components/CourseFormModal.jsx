@@ -15,6 +15,7 @@ const EMPTY_FORM = {
 	subCourses: [],
 	grantsAcademicLevel: '',
 	assessmentRounds: [],
+	customQuestions: [],
 };
 
 const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
@@ -43,6 +44,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				subCourses: course.subCourses || [],
 				grantsAcademicLevel: course.grantsAcademicLevel || '',
 				assessmentRounds: course.assessmentRounds || [],
+				customQuestions: course.customQuestions || [],
 			});
 
 			if (sortedDates.length > 0) {
@@ -130,6 +132,10 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				form.assessmentRounds.filter(Boolean)
 			));
 
+			data.append('customQuestions', JSON.stringify(
+				form.customQuestions.filter(q => q.label)
+			));
+
 			if (course) {
 				await api.put(`courses/admin/${course._id}`, data); // UPDATE
 			} else {
@@ -175,6 +181,58 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 			return { ...p, assessmentRounds: updated };
 		})
 	}
+
+	const addCustomQuestion = () => {
+		setForm(p => ({
+			...p,
+			customQuestions: [...p.customQuestions, {
+				key: `q_${Date.now()}_${p.customQuestions.length}`,
+				label: '',
+				type: 'text',
+				options: [],
+				required: false,
+			}]
+		}));
+	};
+
+	const removeCustomQuestion = (i) => {
+		setForm(p => ({ ...p, customQuestions: p.customQuestions.filter((_, idx) => idx !== i) }));
+	};
+
+	const updateCustomQuestion = (i, field, val) => {
+		setForm(p => {
+			const updated = [...p.customQuestions];
+			updated[i] = {...updated[i], [field]: val };
+			return { ...p, customQuestions: updated };
+		});
+	};
+
+	const addCustomQuestionOption = (qi) => {
+		setForm(p => {
+			const updated = [...p.customQuestions];
+			updated[qi] = { ...updated[qi], options: [...(updated[qi].options || []), '']};
+			return { ...p, customQuestions: updated };
+		});
+	};
+
+	const removeCustomQuestionOption = (qi, oi) => {
+		setForm(p => {
+			const updated = [...p.customQuestions];
+			updated[qi] = { ...updated[qi], options: updated[qi].options.filter((_, idx) => idx !== oi) };
+			return { ...p, customQuestions: updated };
+		});
+	};
+
+	const updateCustomQuestionOption = (qi, oi, val) => {
+		setForm(p => {
+			const updated = [...p.customQuestions];
+			const opts = [...updated[qi].options];
+			opts[oi] = val;
+			updated[qi] = { ...updated[qi], options: opts };
+			return { ...p, customQuestions: updated };
+		});
+	};
+
 	if (!isOpen) return null;
 
 	return (
@@ -417,7 +475,92 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 								+ เพิ่มรอบ
 							</button>
 						</div>
-					)}		
+					)}	
+										<div>
+						<label className="block text-sm font-medium text-gray-700 mb-2">คำถามเพิ่มเติม</label>
+						<div className="space-y-3">
+							{form.customQuestions.map((q, qi) => (
+								<div key={q.key} className="border border-gray-200 rounded-lg p-3 space-y-2">
+									<div className="flex justify-between items-center">
+										<span className="text-sm font-medium text-gray-500">คำถามที่ {qi + 1}</span>
+										<button
+											type="button"
+											onClick={() => removeCustomQuestion(qi)}
+											className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
+										>
+											ลบ
+										</button>
+									</div>
+									<input
+										type="text"
+										placeholder="ข้อความคำถาม"
+										value={q.label}
+										onChange={e => updateCustomQuestion(qi, 'label', e.target.value)}
+										className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+									/>
+									<div className="flex gap-3 items-center flex-wrap">
+										<select
+											value={q.type}
+											onChange={e => updateCustomQuestion(qi, 'type', e.target.value)}
+											className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+										>
+											<option value="text">ข้อความสั้น</option>
+											<option value="textarea">ข้อความยาว</option>
+											<option value="number">ตัวเลข</option>
+											<option value="date">วันที่</option>
+											<option value="radio">ตัวเลือก (radio)</option>
+										</select>
+										<label className="flex items-center text-sm">
+											<input
+												type="checkbox"
+												checked={q.required}
+												onChange={e => updateCustomQuestion(qi, 'required', e.target.checked)}
+												className="mr-2"
+											/>
+											บังคับตอบ
+										</label>
+									</div>
+
+									{q.type === 'radio' && (
+										<div className="pl-3 space-y-2">
+											{(q.options || []).map((opt, oi) => (
+												<div key={oi} className="flex gap-2">
+													<input
+														type="text"
+														placeholder={`ตัวเลือกที่ ${oi + 1}`}
+														value={opt}
+														onChange={e => updateCustomQuestionOption(qi, oi, e.target.value)}
+														className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+													/>
+													<button
+														type="button"
+														onClick={() => removeCustomQuestionOption(qi, oi)}
+														className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
+													>
+														ลบ
+													</button>
+												</div>
+											))}
+											<button
+												type="button"
+												onClick={() => addCustomQuestionOption(qi)}
+												className="text-sm text-[#2d6e5e] hover:underline cursor-pointer"
+											>
+												+ เพิ่มตัวเลือก
+											</button>
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+						<button
+							type="button"
+							onClick={addCustomQuestion}
+							className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer"
+						>
+							+ เพิ่มคำถาม
+						</button>
+					</div>	
 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
 

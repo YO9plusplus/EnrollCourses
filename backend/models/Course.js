@@ -65,6 +65,18 @@ const courseSchema = new mongoose.Schema({
 		default: [],
 	},
 
+	customQuestions: [{
+		key: { type: String, required: true },
+		label: { type: String, required: true },
+		type: {
+			type: String,
+			enum: ['text', 'textarea', 'number', 'date', 'radio'],
+			default: 'text',
+		},
+		options: [String],
+		required: { type: Boolean, default: false },
+	}],
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Course', courseSchema);
