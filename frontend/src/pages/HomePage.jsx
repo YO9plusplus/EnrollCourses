@@ -28,7 +28,16 @@ const HomePage = () => {
     const fetchCourses = async () => {
       try {
         const res = await api.get('/courses?fields=list');
-        setCourses(res.data.courses);
+        const sorted = [...res.data.courses].sort((a,b) => {
+          const aOpen = a.status === 'open' ? 0 : 1;
+          const bOpen = b.status === 'open' ? 0 : 1;
+          if (aOpen !== bOpen) return aOpen - bOpen;
+        
+          const aType = a.formType || '';
+          const bType = b.formType || '';
+          return aType.localeCompare(bType);
+        })
+        setCourses(sorted);
       } catch(err) {
         setError('ไม่สามารถโหลดข้อมูลได้');
       } finally {

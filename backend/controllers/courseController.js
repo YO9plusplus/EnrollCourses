@@ -35,7 +35,7 @@ exports.createCourse = async (req, res) => {
 exports.getAllCourses = async (req, res) => {
 	try {		
 		const { fields } = req.query;
-		const projection = fields === 'list' ? 'title image dates status' : '';
+		const projection = fields === 'list' ? 'title image dates status formType' : '';
 		
 		const courses = await Course.find().select(projection).sort({ _id: -1 });
 
