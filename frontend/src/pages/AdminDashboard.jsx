@@ -153,9 +153,10 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleExport = async (courseId) => {
+    const handleExport = async (courseId, courseType) => {
         try {
             const response = await api.get(`/registrations/admin/export/${courseId}`, {
+                params: courseType ? { courseType } : undefined,
                 responseType: 'blob'
             });
 
@@ -197,6 +198,7 @@ const AdminDashboard = () => {
     const getCourseTitle = (courseId) => courseId?.title ?? '-';
 
     const getCourseIdByFormType = (ft) => courses.find(c => c.formType === ft)?._id;
+    const academicPromotionCourses = courses.filter(c => c.formType === 'academicPromotion');
 
     if (loading) {
         return (
@@ -293,17 +295,27 @@ const AdminDashboard = () => {
             {/* Export Buttons */}
             <div className="mt-4 flex gap-4">
                 <button
-                onClick={() => handleExport(getCourseIdByFormType('scout'))}
-                className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    onClick={() => handleExport(getCourseIdByFormType('scout'))}
+                    className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                 📥 ส่งออก Excel (ลูกเสือ)
                 </button>
                 <button
-                onClick={() => handleExport(getCourseIdByFormType('redcross'))}
-                className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-lg hover:bg-green-700 transition-colors"
+                    onClick={() => handleExport(getCourseIdByFormType('redcross'))}
+                    className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                 📥 ส่งออก Excel (ยุวกาชาด)
                 </button>
+                {academicPromotionCourses.map(c => (
+                    <button
+                        key={c._id}
+                        onClick={() => handleExport(c._id)}
+                        title={c.title}
+                        className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors max-w-[220px] truncate"
+                    >
+                        📥 ส่งออก Excel ({c.grantsAcademicLevel || c.title})
+                    </button>
+                ))}
             </div>
             </div>
 

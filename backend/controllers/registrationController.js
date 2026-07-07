@@ -323,8 +323,15 @@ exports.updateAdminNotes = async (req, res) => {
 exports.exportToExcel = async (req, res) => {
     try {
         const { courseId } = req.params;
+        const { courseType } = req.query;
 
-        const registrations = await Registration.find({ courseId })
+        const course = await Course.findById(courseId);
+        const isAcademicPromotion = course?.formType === 'academicPromotion';
+
+        const filter = { courseId };
+        if (courseType) filter.courseType = courseType;
+
+        const registrations = await Registration.find(filter)
             .populate('user', '-password')
             .sort({ createdAt: -1 });
 
@@ -332,7 +339,7 @@ exports.exportToExcel = async (req, res) => {
         const worksheet = workbook.addWorksheet('Registrations');
 
         // Headers
-        worksheet.columns = [
+        const baseColumns = [
             { header: 'ลำดับ', key: 'no', width: 10 },
             { header: 'วันที่สมัคร', key: 'date', width: 15 },
             { header: 'คำนำหน้า', key: 'title', width: 10 },
@@ -346,12 +353,24 @@ exports.exportToExcel = async (req, res) => {
             { header: 'ตำแหน่ง', key: 'position', width: 15 },
             { header: 'วิทยฐานะ', key: 'academicLevel', width: 20 },
             { header: 'หลักสูตรที่สมัคร', key: 'courseType', width: 50 },
-            { header: 'สถานะ', key: 'status', width: 15 }
+            { header: 'สถานะ', key: 'status', width: 15 },
         ];
+
+        const academicPromotionColumns = [
+            { header: 'อายุราชการ', key: 'yearsOfService', width: 12 },
+            { header: 'สังกัด', key: 'department', width: 20 },
+            { header: 'สายงานที่ขอพัฒนา', key: 'careerTrack', width: 25 },
+            { header: 'กรณีที่ขอพัฒนา', key: 'developmentCase', width: 30 },
+            { header: 'รอบที่ยื่นขอประเมิน (วก.1)', key: 'assessmentRound', width: 30 },
+        ];
+
+        worksheet.columns = isAcademicPromotion
+            ? [...baseColumns, ...academicPromotionColumns]
+            : baseColumns;
 
         // Add data
         registrations.forEach((reg, index) => {
-            worksheet.addRow({
+            const row = {
                 no: index + 1,
                 date: new Date(reg.createdAt).toLocaleDateString('th-TH'),
                 title: reg.user.title,
@@ -366,7 +385,17 @@ exports.exportToExcel = async (req, res) => {
                 academicLevel: reg.user.academicLevel,
                 courseType: reg.courseType,
                 status: reg.status
-            });
+            };
+
+            if (isAcademicPromotion) {
+                row.yearsOfService = reg.yearsOfService;
+                row.department = reg.department;
+                row.careerTrack = reg.careerTrack;
+                row.developmentCase = reg.developmentCase;
+                row.assessmentRound = reg.assessmentRound;
+            }
+
+            worksheet.addRow(row);
         });
 
         // Style header

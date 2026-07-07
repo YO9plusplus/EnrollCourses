@@ -312,7 +312,6 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 						<p className="text-xs text-gray-400 mt-1">ถ้าตั้งค่านี้ไว้ ผู้สมัครที่สถานะเป็น "เสร็จสิ้น" จะขอปรับวิทยฐานะได้</p>
 					</div>
 										
-										{form.formType !== 'academicPromotion' && (
 						<div>
 							<label className="block text-sm font-medium text-gray-700 mb-2">หลักสูตรย่อย</label>
 
@@ -386,7 +385,6 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 								</>
 							)}
 						</div>
-					)}
 
 					{form.formType === 'academicPromotion' && (
 						<div>
