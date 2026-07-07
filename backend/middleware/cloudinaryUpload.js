@@ -13,26 +13,28 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        // Determine file type
-        let resourceType = 'auto';
-        let format = file.mimetype.split('/')[1];
+      let resourceType = 'auto';
+      let format = file.mimetype.split('/')[1];
 
-        // Handle different file types
-        if (file.mimetype === 'application/pdf') {
-            resourceType = 'raw';
-            format = 'pdf'
-        } else if (file.mimetype.startsWith('image/')) {
-            resourceType = 'image';
-        }
+      if (file.mimetype === 'application/pdf') {
+          resourceType = 'raw';
+          format = 'pdf';
+      } else if (file.mimetype.startsWith('image/')) {
+          resourceType = 'image';
+      }
 
-        return {
-            folder: 'course-registrations',
-            allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-            resourceType: resourceType,
-            format: format,
-            public_id: `${file.fieldname}-${Date.now()}`
-        }
-    }
+      const publicId = resourceType === 'raw'
+          ? `${file.fieldname}-${Date.now()}.${format}`
+          : `${file.fieldname}-${Date.now()}`;
+
+      return {
+          folder: 'course-registrations',
+          allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+          resource_type: resourceType,
+          format: format,
+          public_id: publicId,
+      };
+  }
 });
 
 // File filter

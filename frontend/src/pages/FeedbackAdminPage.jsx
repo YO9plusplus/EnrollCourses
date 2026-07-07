@@ -11,6 +11,7 @@ const FeedbackAdminPage = () => {
     const [sending, setSending] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [previewImage, setPreviewImage] = useState(null);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -124,7 +125,25 @@ const FeedbackAdminPage = () => {
                                             </div>
                                         )}
                                         {m.text && <p>{m.text}</p>}
-                                        {m.image?.filepath && <img src={m.image.filepath} alt="แนบ" className="mt-1 rounded max-w-full max-h-48 object-contain" />}
+                                        {m.image?.filepath && (
+                                            m.image.mimetype?.startsWith('image/') ? (
+                                            <img
+                                                src={m.image.filepath}
+                                                alt="แนบ"
+                                                onClick={() => setPreviewImage(m.image.filepath)}
+                                                className="mt-1 rounded max-w-full max-h-48 object-contain cursor-pointer"
+                                            />
+                                            ) : (
+                                                <a
+                                                    href={m.image.filepath}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={`mt-1 flex items-center gap-1 underline text-sm ${m.sender === 'admin' ? 'text-white' : 'text-[#2d6e5e]'}`}
+                                                >
+                                                    <i className="bi bi-file-earmark-pdf"></i> เปิดไฟล์แนบ
+                                                </a>
+                                            )
+                                        )}
                                         <p className={`text-[10px] mt-1 ${m.sender === 'admin' ? 'text-white/70' : 'text-gray-400'}`}>
                                             {new Date(m.createdAt).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
                                         </p>
@@ -160,7 +179,7 @@ const FeedbackAdminPage = () => {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] resize-none"
                                 />
                                 <div className="flex items-center gap-2">
-                                    <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0] || null)} className="text-xs flex-1" />
+                                    <input type="file" accept="image/*,.pdf" onChange={e => setImageFile(e.target.files[0] || null)} className="text-xs flex-1" />
                                     <button
                                         type="submit"
                                         disabled={sending || (!text.trim() && !imageFile)}
@@ -173,6 +192,25 @@ const FeedbackAdminPage = () => {
                         </>
                     )}
                 </div>
+                {previewImage && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                        onClick={() => setPreviewImage(null)}
+                    >
+                        <img
+                            src={previewImage}
+                            alt="ขยาย"
+                            onClick={(e) => e.stopPropagation()}
+                            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+                        />
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute top-4 right-4 text-white text-3xl leading-none cursor-pointer"
+                        >
+                            &times;
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
