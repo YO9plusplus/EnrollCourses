@@ -958,9 +958,32 @@ export const AgreementField = ({ formData, handleChange }) => (
 );
 
 // Academic Promotion (เลื่อนวิทยฐานะ) Fields
-export const AcademicPromotionFields = ({ formData, handleChange, user }) => (
+export const AcademicPromotionFields = ({ formData, handleChange, user, course }) => (
   <div className="border-t pt-4">
     <h4 className="font-semibold text-lg text-gray-800 mb-4">ข้อมูลปัจจุบัน (จากโปรไฟล์)</h4>
+    {course?.assessmentRounds?.length > 0 && (
+      <div className="mb-3">
+        <label className="block text-gray-700 text-sm mb-2">
+          ท่านจะขอยื่นเพื่อขอรับการประเมินเพื่อเลื่อนวิทยฐานะ (วก.1)
+        </label>
+        <div className="flex flex-col gap-2">
+          {course.assessmentRounds.map(opt => (
+            <label key={opt} className="flex items-center">
+              <input
+                type="radio"
+                name="assessmentRound"
+                value={opt}
+                checked={formData.assessmentRound === opt}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <span className="text-sm">{opt}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    )}
+    
     <div className="grid grid-cols-2 gap-3 mb-4 text-sm bg-gray-50 rounded-lg p-3">
       <div><span className="text-gray-500">คุณวุฒิสูงสุด:</span> <span className="font-medium">{user?.education || '-'}</span></div>
       <div><span className="text-gray-500">วิชาเอก:</span> <span className="font-medium">{user?.major || '-'}</span></div>

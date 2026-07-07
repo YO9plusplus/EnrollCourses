@@ -58,7 +58,12 @@ const courseSchema = new mongoose.Schema({
 		type: String,
 		enum: ['ชำนาญการ', 'ชำนาญการพิเศษ', 'เชี่ยวชาญ', 'เชี่ยวชาญพิเศษ', null],
 		default: null,
-	}
+	},
+	
+	assessmentRounds: {
+		type: [String],
+		default: [],
+	},
 
 }, { timestamps: true });
 

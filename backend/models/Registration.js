@@ -63,6 +63,10 @@ const registrationSchema = new mongoose.Schema({
     previousTrainingCount: Number,
     academicWorkCount: Number,
     expectedAcademicWorkArea: String,
+    assessmentRound: {
+        type: String,
+        default: '',
+    },
 
     // File Uploads
     trainingEvidence: {

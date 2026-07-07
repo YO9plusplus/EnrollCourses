@@ -14,6 +14,7 @@ const EMPTY_FORM = {
 	formType: '',
 	subCourses: [],
 	grantsAcademicLevel: '',
+	assessmentRounds: [],
 };
 
 const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
@@ -41,6 +42,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				formType: course.formType || '',
 				subCourses: course.subCourses || [],
 				grantsAcademicLevel: course.grantsAcademicLevel || '',
+				assessmentRounds: course.assessmentRounds || [],
 			});
 
 			if (sortedDates.length > 0) {
@@ -124,6 +126,10 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				form.subCourses.filter(sc => sc.value && sc.label)
 			));
 
+			data.append('assessmentRounds', JSON.stringify(
+				form.assessmentRounds.filter(Boolean)
+			));
+
 			if (course) {
 				await api.put(`courses/admin/${course._id}`, data); // UPDATE
 			} else {
@@ -153,7 +159,22 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 			return {...p, subCourses: updated};
 		});
 	};
+	
+	const addAssessmentRound = () => {
+		setForm(p => ({ ...p, assessmentRounds: [...p.assessmentRounds, '' ] }));
+	};
 
+	const removeAssessmentRound = (i) => {
+		setForm(p => ({ ...p, assessmentRounds: p.assessmentRounds.filter((_, idx) => idx !== i) }));
+	};
+
+	const updateAssessmentRound = (i, val) => {
+		setForm(p => {
+			const updated = [...p.assessmentRounds];
+			updated[i] = val;
+			return { ...p, assessmentRounds: updated };
+		})
+	}
 	if (!isOpen) return null;
 
 	return (
@@ -291,79 +312,114 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 						<p className="text-xs text-gray-400 mt-1">ถ้าตั้งค่านี้ไว้ ผู้สมัครที่สถานะเป็น "เสร็จสิ้น" จะขอปรับวิทยฐานะได้</p>
 					</div>
 										
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">หลักสูตรย่อย</label>
+										{form.formType !== 'academicPromotion' && (
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-2">หลักสูตรย่อย</label>
 
-						{(form.formType === 'scout' || form.formType === 'redcross') ? (
-							<div className="space-y-3">
-								{form.subCourses.map((sc, i) => (
-									<div key={sc.value || i} className="border border-gray-200 rounded-lg p-3 space-y-2">
-										<p className="text-sm font-medium text-gray-700">{sc.label}</p>
-										<input
-											type="date"
-											value={sc.dates?.[0] || ''}
-											onChange={e => updateSubCourse(i, 'dates', e.target.value ? [e.target.value] : [])}
-											className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-										/>
-									</div>
-								))}
-							</div>
-						) : (
-							<>
+							{(form.formType === 'scout' || form.formType === 'redcross') ? (
 								<div className="space-y-3">
 									{form.subCourses.map((sc, i) => (
-										<div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
-											<div className="flex justify-between items-center">
-												<span className="text-sm font-medium text-gray-500">หลักสูตรย่อยที่ {i + 1}</span>
-												<button
-													type="button"
-													onClick={() => removeSubCourse(i)}
-													className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
-												>
-													ลบ
-												</button>
-											</div>
+										<div key={sc.value || i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+											<p className="text-sm font-medium text-gray-700">{sc.label}</p>
 											<input
-												type="text"
-												placeholder="value เช่น สำรอง, ผู้บริหาร"
-												value={sc.value}
-												onChange={e => updateSubCourse(i, 'value', e.target.value)}
-												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-											/>
-											<input
-												type="text"
-												placeholder="label ชื่อเต็มที่แสดงในฟอร์ม"
-												value={sc.label}
-												onChange={e => updateSubCourse(i, 'label', e.target.value)}
-												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-											/>
-											<input
-												type="text"
-												placeholder="ระยะเวลา เช่น 5 วัน 4 คืน"
-												value={sc.duration}
-												onChange={e => updateSubCourse(i, 'duration', e.target.value)}
-												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
-											/>
-											<input
-												type="text"
-												placeholder="คุณสมบัติ (ถ้ามี)"
-												value={sc.requirement}
-												onChange={e => updateSubCourse(i, 'requirement', e.target.value)}
+												type="date"
+												value={sc.dates?.[0] || ''}
+												onChange={e => updateSubCourse(i, 'dates', e.target.value ? [e.target.value] : [])}
 												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
 											/>
 										</div>
 									))}
 								</div>
-								<button
-									type="button"
-									onClick={addSubCourse}
-									className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer"
-								>
-									+ เพิ่มหลักสูตรย่อย
-								</button>
-							</>
-						)}
-					</div>			
+							) : (
+								<>
+									<div className="space-y-3">
+										{form.subCourses.map((sc, i) => (
+											<div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+												<div className="flex justify-between items-center">
+													<span className="text-sm font-medium text-gray-500">หลักสูตรย่อยที่ {i + 1}</span>
+													<button
+														type="button"
+														onClick={() => removeSubCourse(i)}
+														className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
+													>
+														ลบ
+													</button>
+												</div>
+												<input
+													type="text"
+													placeholder="value เช่น สำรอง, ผู้บริหาร"
+													value={sc.value}
+													onChange={e => updateSubCourse(i, 'value', e.target.value)}
+													className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+												/>
+												<input
+													type="text"
+													placeholder="label ชื่อเต็มที่แสดงในฟอร์ม"
+													value={sc.label}
+													onChange={e => updateSubCourse(i, 'label', e.target.value)}
+													className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+												/>
+												<input
+													type="text"
+													placeholder="ระยะเวลา เช่น 5 วัน 4 คืน"
+													value={sc.duration}
+													onChange={e => updateSubCourse(i, 'duration', e.target.value)}
+													className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+												/>
+												<input
+													type="text"
+													placeholder="คุณสมบัติ (ถ้ามี)"
+													value={sc.requirement}
+													onChange={e => updateSubCourse(i, 'requirement', e.target.value)}
+													className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+												/>
+											</div>
+										))}
+									</div>
+									<button
+										type="button"
+										onClick={addSubCourse}
+										className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer"
+									>
+										+ เพิ่มหลักสูตรย่อย
+									</button>
+								</>
+							)}
+						</div>
+					)}
+
+					{form.formType === 'academicPromotion' && (
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-2">รอบการยื่นขอประเมิน (วก.1)</label>
+							<div className="space-y-2">
+								{form.assessmentRounds.map((round, i) => (
+									<div key={i} className="flex gap-2">
+										<input
+											type="text"
+											placeholder="เช่น 16-31 พฤศจิกายน 2569"
+											value={round}
+											onChange={e => updateAssessmentRound(i, e.target.value)}
+											className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+										/>
+										<button
+											type="button"
+											onClick={() => removeAssessmentRound(i)}
+											className="text-red-500 hover:text-red-700 cursor-pointer text-sm"
+										>
+											ลบ
+										</button>
+									</div>
+								))}
+							</div>
+							<button
+								type="button"
+								onClick={addAssessmentRound}
+								className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer"
+							>
+								+ เพิ่มรอบ
+							</button>
+						</div>
+					)}		
 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
 

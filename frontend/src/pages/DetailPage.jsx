@@ -198,6 +198,7 @@ const DetailPage = () => {
                         formData={formData}
                         handleChange={handleChange}
                         user={user}
+                        course={course}
                       />
                     )}
 
