@@ -42,7 +42,7 @@ const FeedbackAdminPage = () => {
 
             const res = await api.post(`/feedbacks/admin/${selected._id}/messages`, formData);
             setSelected(res.data.feedback);
-            markAdminThreadSeen(selected._id, res.data.feedback.message.length);
+            markAdminThreadSeen(selected._id, res.data.feedback.messages.length);
             setReplyingTo(null);
             setText('');
             setImageFile(null);
