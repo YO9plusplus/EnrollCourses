@@ -14,6 +14,11 @@ const feedbackSchema = new mongoose.Schema({
 			filepath: String,
 			mimetype: String,
 		},
+		replyTo: {
+			messageId: mongoose.Schema.Types.ObjectId,
+			sender: String,
+			text: String,
+		},
 		createdAt: { type: Date, default: Date.now },
 	}],
 	path: {

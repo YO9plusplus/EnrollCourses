@@ -3,7 +3,6 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 import Navbar from '../components/Navbar';
 import { DEV_EMAIL } from '../config/devAccount';
-import "bootstrap-icons/font/bootstrap-icons.css";
 
 const LoginPage = () => {
     const navigate = useNavigate();

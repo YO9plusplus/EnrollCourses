@@ -43,3 +43,26 @@ export function markAsSeen(count) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {}
 }
+
+const ADMIN_SEEN_KEY = 'feedbackAdminSeen';
+
+function getAdminSeenMap() {
+    const raw = localStorage.getItem(ADMIN_SEEN_KEY);
+    if (!raw) return {};
+    try {
+        return JSON.parse(raw);
+    } catch {
+        return {};
+    }
+}
+
+export function getAdminUnreadCount(threadId, totalMessages) {
+    const lastSeen = getAdminSeenMap()[threadId] || 0;
+    return Math.max(0, totalMessages - lastSeen);
+}
+
+export function markAdminThreadSeen(threadId, totalMessages) {
+    const seen = getAdminSeenMap();
+    seen[threadId] = totalMessages;
+    localStorage.setItem(ADMIN_SEEN_KEY, JSON.stringify(seen));
+}

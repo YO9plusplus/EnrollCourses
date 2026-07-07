@@ -41,6 +41,15 @@ exports.getThreadByToken = async (req, res) => {
 	}
 };
 
+const buildReplyPayload = (req) => {
+	if (!req.body.replyToId) return undefined;
+	return {
+		messageId: req.body.replyToId,
+		sender: req.body.replyToSender,
+		text: req.body.replyToText,
+	};
+};
+
 exports.addUserMessage = async (req, res) => {
 	try {
 		const feedback = await Feedback.findOne({ token: req.params.token });
@@ -52,6 +61,7 @@ exports.addUserMessage = async (req, res) => {
 			sender: 'user',
 			text: req.body.message,
 			image: buildImagePayload(req.file),
+			replyTo: buildReplyPayload(req),
 		});
 		await feedback.save();
 
@@ -92,6 +102,7 @@ exports.addAdminMessage = async (req, res) => {
 			sender: 'admin',
 			text: req.body.message,
 			image: buildImagePayload(req.file),
+			replyTo: buildReplyPayload(req),
 		});
 		await feedback.save();
 		res.json({ success: true, feedback });
