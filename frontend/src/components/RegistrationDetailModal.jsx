@@ -1,5 +1,7 @@
 import React from 'react';
 import api from '../utils/api';
+import { calculateAge } from '../utils/age';
+import { getSubCourseLabel } from '../config/fixedSubCourses';
 
 const RegistrationDetailModal = ({
     registration,
@@ -31,20 +33,6 @@ const RegistrationDetailModal = ({
         );
     };
 
-    const getCourseTitle = (courseId) => {
-        return courseId === '10' ? 'ลูกเสือ' : 'ยุวกาชาด';
-    };
-
-    const handleApprove = () => {
-        onStatusChange(registration._id, 'approved');
-        onClose();
-    };
-
-    const handleReject = () => {
-        onStatusChange(registration._id, 'rejected');
-        onClose();
-    };
-
     const handleOpenFile = async (filepath) => {
         const publicId = filepath.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
         const resourceType = filepath.includes('/raw/') ? 'raw' : 'image';
@@ -55,6 +43,23 @@ const RegistrationDetailModal = ({
 
         window.open(res.data.url, '_blank');
     }
+
+    const formType = registration.courseId?.formType;
+    const user = registration.user || {};
+
+    const Field = ({ label, value }) => (
+        <div>
+            <span className="text-sm text-gray-600">{label}:</span>
+            <p className="font-medium">{value || '-'}</p>
+        </div>
+    );
+
+    const files = [
+        { label: 'หลักฐานการฝึกอบรม', file: registration.trainingEvidence },
+        { label: 'คำยินยอมจากผู้บังคับบัญชา', file: registration.supervisorConsent },
+        { label: 'ใบรับรองแพทย์', file: registration.medicalCertificate },
+        { label: 'ใบสมัคร (ลงชื่อแล้ว)', file: registration.applicationForm },
+    ].filter(doc => doc.file?.filepath);
 
     return (
         <div 
@@ -96,26 +101,29 @@ const RegistrationDetailModal = ({
                         </div>
                     </div>
 
+                    {/* Course Info */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">หลักสูตรที่สมัคร</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Field label="ชื่อหลักสูตร" value={registration.courseId?.title} />
+                            {registration.courseType && (
+                                <Field label="หลักสูตรย่อย/ตัวเลือก" value={getSubCourseLabel(registration.courseType)} />
+                            )}
+                        </div>
+                    </div>
+
                     {/* Personal Info */}
                     <div>
                         <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">ข้อมูลส่วนตัว</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <span className="text-sm text-gray-600">ชื่อ-นามสกุล:</span>
-                                <p className="font-medium">{registration.user?.title} {registration.user?.firstName} {registration.user?.lastName}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm text-gray-600">อีเมล:</span>
-                                <p className="font-medium">{registration.user?.email}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm text-gray-600">เบอร์โทรศัพท์:</span>
-                                <p className="font-medium">{registration.user?.mobilePhone || '-'}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm text-gray-600">LINE ID:</span>
-                                <p className="font-medium">{registration.user?.lineId || '-'}</p>
-                            </div>
+                            <Field label="ชื่อ-นามสกุล" value={`${user.title || ''} ${user.firstName || ''} ${user.lastName || ''}`.trim()} />
+                            <Field label="อีเมล" value={user.email} />
+                            <Field label="เบอร์โทรศัพท์" value={user.mobilePhone} />
+                            <Field label="LINE ID" value={user.lineId} />
+                            <Field label="อายุ" value={user.birthDate ? `${calculateAge(user.birthDate)} ปี` : null} />
+                            <Field label="ศาสนา" value={user.religion} />
+                            <Field label="วุฒิการศึกษา" value={user.education} />
+                            <Field label="วิชาเอก" value={user.major} />
                         </div>
                     </div>
 
@@ -123,29 +131,105 @@ const RegistrationDetailModal = ({
                     <div>
                         <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">ข้อมูลการทำงาน</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <span className="text-sm text-gray-600">โรงเรียน/หน่วยงาน:</span>
-                                <p className="font-medium">{registration.user?.school || '-'}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm text-gray-600">ตำแหน่ง:</span>
-                                <p className="font-medium">{registration.user?.position || '-'}</p>
-                            </div>
+                            <Field label="โรงเรียน/หน่วยงาน" value={user.school} />
+                            <Field label="เขต" value={user.district} />
+                            <Field label="ตำแหน่ง" value={user.position} />
+                            <Field label="วิทยฐานะปัจจุบัน" value={user.academicLevel} />
                         </div>
                     </div>
 
-                    {/* Documents - FIXED SECTION */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">เอกสารแนบ</h3>
-                        <div className="space-y-2">
-                            {[
-                                { label: 'หลักฐานการฝึกอบรม', file: registration.trainingEvidence },
-                                { label: 'คำยินยอมจากผู้บังคับบัญชา', file: registration.supervisorConsent },
-                                { label: 'ใบรับรองแพทย์', file: registration.medicalCertificate }
-                            ].map((doc, idx) => (
-                                doc.file?.filepath && (
+                    {/* Health */}
+                    {(user.healthCondition || user.foodRestrictions) && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">สุขภาพและอาหาร</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Field label="โรคประจำตัว" value={user.healthCondition} />
+                                <Field label="อาหารที่ไม่รับประทาน/แพ้" value={user.foodRestrictions} />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Scout-specific */}
+                    {formType === 'scout' && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">ประสบการณ์การฝึกอบรม (ลูกเสือ)</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Field label="เคยผ่านการฝึกอบรม B.T.C." value={registration.hasBasicTraining ? 'เคย' : 'ไม่เคย'} />
+                                {registration.hasBasicTraining && (
+                                    <>
+                                        <Field label="ประเภท" value={registration.trainingType} />
+                                        <Field label="สถานที่ฝึกอบรม" value={registration.trainingLocation} />
+                                        <Field label="ระหว่างวันที่" value={registration.trainingDate} />
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Redcross-specific */}
+                    {formType === 'redcross' && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">ประสบการณ์การฝึกอบรม (ยุวกาชาด)</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Field label="เคยผ่านการฝึกอบรมมาก่อน" value={registration.hasPreviousTraining ? 'เคย' : 'ไม่เคย'} />
+                                {registration.hasPreviousTraining && (
+                                    <>
+                                        <Field label="หลักสูตรที่ผ่านมา" value={getSubCourseLabel(registration.previousTrainingCourse)} />
+                                        <Field label="เลขที่รุ่น" value={registration.previousTrainingNumber} />
+                                        <Field label="สถานที่ฝึกอบรม" value={registration.previousTrainingLocation} />
+                                        <Field label="ระหว่างวันที่" value={registration.previousTrainingDate} />
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Academic Promotion-specific */}
+                    {formType === 'academicPromotion' && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">ข้อมูลการรับราชการ (เลื่อนวิทยฐานะ)</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Field label="อายุราชการ" value={registration.yearsOfService ? `${registration.yearsOfService} ปี` : null} />
+                                <Field label="สังกัด" value={registration.department} />
+                                <Field label="วันที่แต่งตั้งตำแหน่งปัจจุบัน" value={registration.positionAppointedDate} />
+                                <Field label="วันที่แต่งตั้งวิทยฐานะปัจจุบัน" value={registration.academicLevelAppointedDate} />
+                                <Field label="วันที่รับราชการในตำแหน่ง/สถานศึกษาปัจจุบัน" value={registration.currentPositionSchoolDate} />
+                                <Field label="สายงานที่ขอเข้ารับการพัฒนา" value={registration.careerTrack} />
+                                <Field label="กรณีที่ขอเข้ารับการพัฒนา" value={registration.developmentCase} />
+                                {registration.developmentCase === 'วุฒิบัตรการพัฒนาครบ 5 ปี' && (
+                                    <>
+                                        <Field label="วันที่ได้วุฒิบัตร" value={registration.developmentCaseCertDate} />
+                                        <Field label="จำนวนครั้ง" value={registration.developmentCaseCertCount} />
+                                    </>
+                                )}
+                                <Field label="เคยเข้ารับการฝึกอบรมโครงการฯ วิทยฐานะ (ครั้ง)" value={registration.previousTrainingCount} />
+                                <Field label="เคยส่งผลงานทางวิชาการ (ครั้ง)" value={registration.academicWorkCount} />
+                                <Field label="คาดว่าจะส่งผลงานด้านที่ 3 (กลุ่มสาระ)" value={registration.expectedAcademicWorkArea} />
+                                <Field label="รอบที่ยื่นขอประเมิน (วก.1)" value={registration.assessmentRound} />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Custom Questions (per-course, dynamic) */}
+                    {registration.customAnswers?.length > 0 && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">คำถามเพิ่มเติม</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {registration.customAnswers.map((a, i) => (
+                                    <Field key={i} label={a.label || a.key} value={a.value} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Documents */}
+                    {files.length > 0 && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">เอกสารแนบ</h3>
+                            <div className="space-y-2">
+                                {files.map((doc, idx) => (
                                     <div key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded border">
-                                    <span className="text-sm text-gray-700">📄 {doc.label}</span>
+                                        <span className="text-sm text-gray-700">📄 {doc.label}</span>
                                         <button 
                                             onClick={() => handleOpenFile(doc.file.filepath)}
                                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm transition-colors"
@@ -153,10 +237,18 @@ const RegistrationDetailModal = ({
                                             เปิดไฟล์
                                         </button>
                                     </div>
-                                )
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* Admin Notes */}
+                    {registration.adminNotes && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">หมายเหตุจากแอดมิน</h3>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{registration.adminNotes}</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}
