@@ -6,7 +6,8 @@ import CourseDetailCard from "../components/CourseDetailCard";
 import { formConfigs, extraFieldComponents } from "../config/formConfigs";
 import { 
   CourseSelectionField, 
-  AgreementField
+  AgreementField,
+  CustomQuestionFields
 } from "../components/FormFields";
 import api from '../utils/api'
 
@@ -48,6 +49,9 @@ const DetailPage = () => {
           });
           config.requiredFiles.forEach(file => { initialData[file] = null; });
           config.optionalFiles.forEach(file => { initialData[file] = null; });
+          (fetchedCourse.customQuestions || []).forEach(q => {
+            initialData[`custom_${q.key}`] = '';
+          });
           initialData.courseType = '';
           initialData.agreeToRules = false;
           setFormData(initialData);
@@ -201,6 +205,13 @@ const DetailPage = () => {
                         course={course}
                       />
                     )}
+
+                    {/* Custom Questions */}
+                    <CustomQuestionFields 
+                      course={course}
+                      formData={formData}
+                      handleChange={handleChange}
+                    />
 
                     {/* Agreement */}
                     <AgreementField

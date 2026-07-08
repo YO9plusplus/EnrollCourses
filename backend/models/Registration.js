@@ -67,8 +67,9 @@ const registrationSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
-    customQuestions: [{
+    customAnswers: [{
         key: String,
+        label: String,
         value: String,
     }],
 

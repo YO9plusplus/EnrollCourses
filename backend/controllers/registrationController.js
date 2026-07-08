@@ -11,8 +11,9 @@ exports.createRegistration = async (req, res) => {
     try {
         const existing = await Registration.findOne({
             user: req.user.id,
-            courseId: req.body.courseId
-        })
+            courseId: req.body.courseId,
+            status: { $ne: 'rejected' },
+        });
 
         if (existing) {
             return res.status(400).json({
@@ -21,11 +22,21 @@ exports.createRegistration = async (req, res) => {
             })
         }
 
+        const course = await Course.findById(req.body.courseId);
+        const customAnswers = (course?.customQuestions || [])
+            .map(q => ({
+                key: q.key,
+                label: q.label,
+                value: req.body[`custom_${q.key}`] ?? ''
+            }))
+            .filter(a => a.value !== '');
+
         const registrationData = new Registration({
             user: req.user.id,
             courseId: req.body.courseId,
             courseType: req.body.courseType,
             agreeToRules: req.body.agreeToRules === 'true',
+            customAnswers,
 
             // Previous training (Scout)
             hasBasicTraining: req.body.hasBasicTraining === 'true',
@@ -364,9 +375,15 @@ exports.exportToExcel = async (req, res) => {
             { header: 'รอบที่ยื่นขอประเมิน (วก.1)', key: 'assessmentRound', width: 30 },
         ];
 
+        const customColumns = (course?.customQuestions || []).map(q => ({
+            header: q.label,
+            key: `custom_${q.key}`,
+            width: 25,
+        }));
+
         worksheet.columns = isAcademicPromotion
-            ? [...baseColumns, ...academicPromotionColumns]
-            : baseColumns;
+            ? [...baseColumns, ...academicPromotionColumns, ...customColumns]
+            : [...baseColumns, ...customColumns];
 
         // Add data
         registrations.forEach((reg, index) => {
@@ -394,6 +411,10 @@ exports.exportToExcel = async (req, res) => {
                 row.developmentCase = reg.developmentCase;
                 row.assessmentRound = reg.assessmentRound;
             }
+            (course?.customQuestions || []).forEach(q => {
+                const answer = reg.customAnswers?.find(a => a.key === q.key);
+                row[`custom_${q.key}`] = answer?.value || '';
+            });
 
             worksheet.addRow(row);
         });

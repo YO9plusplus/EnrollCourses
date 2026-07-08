@@ -1127,3 +1127,86 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
   </div>
   </div>
 );
+
+export const CustomQuestionFields = ({ course, formData, handleChange }) => {
+  if (!course?.customQuestions?.length) return null;
+
+  return (
+    <div className="border-t pt-4">
+      <h4 className="font-semibold text-lg text-gray-800 mb-4">คำถามเพิ่มเติม</h4>
+      {course.customQuestions.map(q => {
+        const name = `custom_${q.key}`;
+        return (
+          <div key={q.key} className="mb-3">
+            <label className="block text-gray-700 text-sm mb-2">
+              {q.label} {q.required && <span className="text-red-500">*</span>}
+            </label>
+
+            {q.type === 'text' && (
+              <input
+                type="text"
+                name={name}
+                value={formData[name] || ''}
+                onChange={handleChange}
+                required={q.required}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+              />
+            )}
+
+            {q.type === 'textarea' && (
+              <textarea
+                name={name}
+                value={formData[name] || ''}
+                onChange={handleChange}
+                required={q.required}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+              />
+            )}
+
+            {q.type === 'number' && (
+              <input
+                type="number"
+                name={name}
+                value={formData[name] || ''}
+                onChange={handleChange}
+                required={q.required}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+              />
+            )}
+
+            {q.type === 'date' && (
+              <input
+                type="date"
+                name={name}
+                value={formData[name] || ''}
+                onChange={handleChange}
+                required={q.required}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+              />
+            )}
+
+            {q.type === 'radio' && (
+              <div className="flex flex-col gap-2">
+                {(q.options || []).map(opt => (
+                  <label key={opt} className="flex items-center">
+                    <input
+                      type="radio"
+                      name={name}
+                      value={opt}
+                      checked={formData[name] === opt}
+                      onChange={handleChange}
+                      required={q.required}
+                      className="mr-2"
+                    />
+                    <span className="text-sm">{opt}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
