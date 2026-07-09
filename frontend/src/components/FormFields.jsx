@@ -1057,7 +1057,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
     <div className="mb-3">
       <label className="block text-gray-700 text-sm mb-2">ขอเข้ารับการพัฒนาก่อนแต่งตั้งในกรณี</label>
       <div className="flex flex-col gap-2">
-        {['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2569'].map(opt => (
+        {['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2570'].map(opt => (
           <label key={opt} className="flex items-center">
             <input type="radio" name="developmentCase" value={opt} checked={formData.developmentCase === opt} onChange={handleChange} className="mr-2" />
             <span className="text-sm">{opt}</span>
@@ -1065,7 +1065,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
         ))}
       </div>
 
-      {formData.developmentCase === 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2569' && (
+      {formData.developmentCase === 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2570' && (
         <div className="mt-2 pl-6">
           <label className="block text-gray-700 text-sm mb-2">วันที่หมดอายุ</label>
           <input type="date" name="developmentCaseCertDate" value={formData.developmentCaseCertDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
