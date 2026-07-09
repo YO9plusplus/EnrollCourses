@@ -56,7 +56,7 @@ const registrationSchema = new mongoose.Schema({
     },
     developmentCase: {
         type: String,
-        enum: ['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาครบ 5 ปี', '']
+        enum: ['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2569', '']
     },
     developmentCaseCertDate: String,
     developmentCaseCertCount: Number,
