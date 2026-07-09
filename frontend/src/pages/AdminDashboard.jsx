@@ -6,6 +6,7 @@ import api from '../utils/api';
 import AdminLayout from '../components/AdminLayout';
 import AcademicLevelRequestsPanel from "../components/AcademicLevelRequestsPanel";
 import { getSubCourseLabel } from "../config/fixedSubCourses";
+import ExportFieldPickerModal from "../components/ExportFieldPickerModal";
 
 const AdminDashboard = () => {
     const { user, isAuthenticated } = useAuth();
@@ -25,7 +26,7 @@ const AdminDashboard = () => {
     });
     const [updatingId, setUpdatingId] = useState(null);
     const [courses, setCourses] = useState([]);
-
+    const [exportCourse, setExportCourse] = useState(null);
 
 
     const handleViewDetails = (registration) => {
@@ -153,26 +154,6 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleExport = async (courseId, courseType) => {
-        try {
-            const response = await api.get(`/registrations/admin/export/${courseId}`, {
-                params: courseType ? { courseType } : undefined,
-                responseType: 'blob'
-            });
-
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `registrations-${courseId}-${Date.now()}.xlsx`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        } catch(error) {
-            console.error('Export error:', error);
-            showToast('ไม่สามารถแปลงไฟล์เป็น excel ได้', 'error');
-        }
-    }
-
     const getStatusBadge = (status) => {
         const styles = {
         pending: 'bg-yellow-100 text-yellow-800',
@@ -196,9 +177,6 @@ const AdminDashboard = () => {
     };
 
     const getCourseTitle = (courseId) => courseId?.title ?? '-';
-
-    const getCourseIdByFormType = (ft) => courses.find(c => c.formType === ft)?._id;
-    const academicPromotionCourses = courses.filter(c => c.formType === 'academicPromotion');
 
     if (loading) {
         return (
@@ -293,29 +271,19 @@ const AdminDashboard = () => {
             </div>
 
             {/* Export Buttons */}
-            <div className="mt-4 flex gap-4">
-                <button
-                    onClick={() => handleExport(getCourseIdByFormType('scout'))}
-                    className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                📥 ส่งออก Excel (ลูกเสือ)
-                </button>
-                <button
-                    onClick={() => handleExport(getCourseIdByFormType('redcross'))}
-                    className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                📥 ส่งออก Excel (ยุวกาชาด)
-                </button>
-                {academicPromotionCourses.map(c => (
-                    <button
-                        key={c._id}
-                        onClick={() => handleExport(c._id)}
-                        title={c.title}
-                        className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors max-w-[220px] truncate"
-                    >
-                        📥 ส่งออก Excel ({c.grantsAcademicLevel || c.title})
-                    </button>
-                ))}
+            <div className="mt-4 flex gap-4 flex-wrap">
+                {courses
+                    .filter(c => ['scout', 'redcross', 'academicPromotion'].includes(c.formType))
+                    .map(c => (
+                        <button
+                            key={c._id}
+                            onClick={() => setExportCourse(c)}
+                            title={c.title}
+                            className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors max-w-[220px] truncate"
+                        >
+                            📥 Export ({c.grantsAcademicLevel || c.title})
+                        </button>
+                    ))}
             </div>
             </div>
 
@@ -421,6 +389,12 @@ const AdminDashboard = () => {
                     {toast.message}
                 </div>
             )}
+
+            <ExportFieldPickerModal 
+                isOpen={!!exportCourse}
+                course={exportCourse}
+                onClose={() => setExportCourse(null)}
+            />
     </AdminLayout>
   );
 }

@@ -3,6 +3,7 @@ const Course = require('../models/Course');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
 const ExcelJS = require('exceljs');
+const { STATIC_FIELDS } = require('../utils/exportFieldCatalog');
 
 // @desc    Create new registration
 // @route   POST /api/registrations
@@ -328,16 +329,34 @@ exports.updateAdminNotes = async (req, res) => {
     }
 };
 
+exports.getExportFields = async (req, res) => {
+    try {
+        const course = await Course.findById(req.params.courseId);
+        const fields = [
+            ...STATIC_FIELDS
+                .filter(f => !f.formType || f.formType === course?.formType)
+                .map(f => ({ key: f.key, label: f.label, group: f.group })),
+            ...(course?.customQuestions || []).map(q => ({
+                key: `custom_${q.key}`,
+                label: q.label,
+                group: 'คำถามเพิ่มเติม'
+            })),
+        ];
+        res.json({ success: true, fields });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to get export fields' });
+    }
+};
+
 // @desc    Export registrations to Excel (Admin)
 // @route   GET /api/registrations/admin/export/:courseId
 // @access  Private/Admin
 exports.exportToExcel = async (req, res) => {
     try {
         const { courseId } = req.params;
-        const { courseType } = req.query;
+        const { courseType, fields } = req.query;
 
         const course = await Course.findById(courseId);
-        const isAcademicPromotion = course?.formType === 'academicPromotion';
 
         const filter = { courseId };
         if (courseType) filter.courseType = courseType;
@@ -346,80 +365,34 @@ exports.exportToExcel = async (req, res) => {
             .populate('user', '-password')
             .sort({ createdAt: -1 });
 
+        const allFields = [
+            ...STATIC_FIELDS.filter(f => !f.formType || f.formType === course?.formType),
+            ...(course?.customQuestions || []).map(q => ({
+                key: `custom_${q.key}`,
+                label: q.label,
+                get: (reg) => reg.customAnswers?.find(a => a.key === q.key)?.value || ''
+            })),
+        ];
+
+        const selectedKeys = fields ? fields.split(',') : null;
+        const activeFields = selectedKeys
+            ? allFields.filter(f => selectedKeys.includes(f.key))
+            : allFields;
+
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Registrations');
 
-        // Headers
-        const baseColumns = [
+        worksheet.columns = [
             { header: 'ลำดับ', key: 'no', width: 10 },
-            { header: 'วันที่สมัคร', key: 'date', width: 15 },
-            { header: 'คำนำหน้า', key: 'title', width: 10 },
-            { header: 'ชื่อ', key: 'firstName', width: 20 },
-            { header: 'นามสกุล', key: 'lastName', width: 20 },
-            { header: 'อีเมล', key: 'email', width: 30 },
-            { header: 'เบอร์โทร', key: 'phone', width: 15 },
-            { header: 'LINE ID', key: 'lineId', width: 15 },
-            { header: 'โรงเรียน', key: 'school', width: 30 },
-            { header: 'เขต', key: 'district', width: 20 },
-            { header: 'ตำแหน่ง', key: 'position', width: 15 },
-            { header: 'วิทยฐานะ', key: 'academicLevel', width: 20 },
-            { header: 'หลักสูตรที่สมัคร', key: 'courseType', width: 50 },
-            { header: 'สถานะ', key: 'status', width: 15 },
+            ...activeFields.map(f => ({ header: f.label, key: f.key, width: 25 }))
         ];
 
-        const academicPromotionColumns = [
-            { header: 'อายุราชการ', key: 'yearsOfService', width: 12 },
-            { header: 'สังกัด', key: 'department', width: 20 },
-            { header: 'สายงานที่ขอพัฒนา', key: 'careerTrack', width: 25 },
-            { header: 'กรณีที่ขอพัฒนา', key: 'developmentCase', width: 30 },
-            { header: 'รอบที่ยื่นขอประเมิน (วก.1)', key: 'assessmentRound', width: 30 },
-        ];
-
-        const customColumns = (course?.customQuestions || []).map(q => ({
-            header: q.label,
-            key: `custom_${q.key}`,
-            width: 25,
-        }));
-
-        worksheet.columns = isAcademicPromotion
-            ? [...baseColumns, ...academicPromotionColumns, ...customColumns]
-            : [...baseColumns, ...customColumns];
-
-        // Add data
-        registrations.forEach((reg, index) => {
-            const row = {
-                no: index + 1,
-                date: new Date(reg.createdAt).toLocaleDateString('th-TH'),
-                title: reg.user.title,
-                firstName: reg.user.firstName,
-                lastName: reg.user.lastName,
-                email: reg.user.email,
-                phone: reg.user.mobilePhone,
-                lineId: reg.user.lineId,
-                school: reg.user.school,
-                district: reg.user.district,
-                position: reg.user.position,
-                academicLevel: reg.user.academicLevel,
-                courseType: reg.courseType,
-                status: reg.status
-            };
-
-            if (isAcademicPromotion) {
-                row.yearsOfService = reg.yearsOfService;
-                row.department = reg.department;
-                row.careerTrack = reg.careerTrack;
-                row.developmentCase = reg.developmentCase;
-                row.assessmentRound = reg.assessmentRound;
-            }
-            (course?.customQuestions || []).forEach(q => {
-                const answer = reg.customAnswers?.find(a => a.key === q.key);
-                row[`custom_${q.key}`] = answer?.value || '';
-            });
-
+        registrations.forEach((reg, idx) => {
+            const row = { no: idx + 1 };
+            activeFields.forEach(f => { row[f.key] = f.get(reg); });
             worksheet.addRow(row);
         });
 
-        // Style header
         worksheet.getRow(1).font = { bold: true };
         worksheet.getRow(1).fill = {
             type: 'pattern',
@@ -427,7 +400,6 @@ exports.exportToExcel = async (req, res) => {
             fgColor: { argb: 'FF2d6e5e' }
         };
 
-        // Set response headers
         res.setHeader(
             'Content-Type',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

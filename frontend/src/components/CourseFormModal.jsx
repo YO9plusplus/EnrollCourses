@@ -334,7 +334,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
                             <input
                                 type="number"
                                 min={1}
-                                value={form.capacity}
+                                value={form.capacity ?? ''}
                                 onChange={e => setForm(p => ({ ...p, capacity: e.target.value }))}
                                 placeholder="ไม่จำกัด"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"

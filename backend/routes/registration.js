@@ -21,6 +21,7 @@ router.get('/admin/course/:courseId', auth, adminAuth, registrationController.ge
 router.get('/admin/status/:status', auth, adminAuth, registrationController.getRegistrationsByStatus);
 router.put('/admin/:id/status', auth, adminAuth, registrationController.updateRegistrationStatus);
 router.put('/admin/:id/notes', auth, adminAuth, registrationController.updateAdminNotes);
+router.get('/admin/export-fields/:courseId', auth, adminAuth, registrationController.getExportFields);
 router.get('/admin/export/:courseId', auth, adminAuth, registrationController.exportToExcel);
 router.get('/admin/signed-url', auth, adminAuth, registrationController.getSignedUrl);
 router.get('/admin/by-user', auth, adminAuth, registrationController.getRegistrationsGroupedByUser);
