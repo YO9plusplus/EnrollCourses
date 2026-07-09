@@ -385,7 +385,8 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 												type="date"
 												value={sc.dates?.[0] || ''}
 												onChange={e => updateSubCourse(i, 'dates', e.target.value ? [e.target.value] : [])}
-												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+												onClick={(e) => e.target.showPicker?.()}
+												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] cursor-pointer"
 											/>
 										</div>
 									))}
@@ -518,7 +519,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 												type="checkbox"
 												checked={q.required}
 												onChange={e => updateCustomQuestion(qi, 'required', e.target.checked)}
-												className="mr-2"
+												className="mr-2 cursor-pointer"
 											/>
 											บังคับตอบ
 										</label>

@@ -19,7 +19,7 @@ export const CourseSelectionField = ({ options, formData, handleChange }) => (
             checked={formData.courseType === option.value}
             onChange={handleChange}
             required
-            className="mt-1 mr-2"
+            className="mt-1 mr-2 cursor-pointer"
           />
           <div className="text-sm">
             <div>{option.label}</div>
@@ -125,8 +125,9 @@ export const PersonalInfoFields = ({ formData, handleChange }) => (
           name="birthDate"
           value={formData.birthDate}
           onChange={handleChange}
+          onClick={(e) => e.target.showPicker?.()}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] cursor-pointer"
         />
         {formData.birthDate && (
           <p className="text-xs text-gray-500 mt-1">อายุ {calculateAge(formData.birthDate)} ปี</p>
@@ -571,7 +572,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
               name="hasBasicTraining"
               checked={formData.hasBasicTraining}
               onChange={handleChange}
-              className="mr-2"
+              className="mr-2 cursor-pointer"
             />
             <span className="text-gray-700">เคยผ่านการฝึกอบรมลูกเสือขั้นความรู้เบื้องต้น (B.T.C.)</span>
           </label>
@@ -591,7 +592,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
                     value="สำรอง"
                     checked={formData.trainingType === 'สำรอง'}
                     onChange={handleChange}
-                    className="mr-2"
+                    className="mr-2 cursor-pointer"
                   />
                   <span className="text-sm">สำรอง</span>
                 </label>
@@ -602,7 +603,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
                     value="สามัญ"
                     checked={formData.trainingType === 'สามัญ'}
                     onChange={handleChange}
-                    className="mr-2"
+                    className="mr-2 cursor-pointer"
                   />
                   <span className="text-sm">สามัญ</span>
                 </label>
@@ -613,7 +614,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
                     value="สามัญรุ่นใหญ่"
                     checked={formData.trainingType === 'สามัญรุ่นใหญ่'}
                     onChange={handleChange}
-                    className="mr-2"
+                    className="mr-2 cursor-pointer"
                   />
                   <span className="text-sm">สามัญรุ่นใหญ่</span>
                 </label>
@@ -756,7 +757,7 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPos
               name="hasPreviousTraining"
               checked={formData.hasPreviousTraining}
               onChange={handleChange}
-              className="mr-2"
+              className="mr-2 cursor-pointer"
             />
             <span className="text-gray-700">ผ่านการฝึกอบรมยุวกาชาดมาก่อน</span>
           </label>
@@ -770,7 +771,7 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPos
                 name="hasSchoolAdminRole"
                 checked={formData.hasSchoolAdminRole || false}
                 onChange={handleChange}
-                className="mr-2"
+                className="mr-2 cursor-pointer"
               />
               <span className="text-gray-700 text-sm">
                 ยืนยันว่าปัจจุบันดำรงตำแหน่งผู้บริหารสถานศึกษา
@@ -975,7 +976,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
                 value={opt}
                 checked={formData.assessmentRound === opt}
                 onChange={handleChange}
-                className="mr-2"
+                className="mr-2 cursor-pointer"
               />
               <span className="text-sm">{opt}</span>
             </label>
@@ -1019,7 +1020,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
               value={opt}
               checked={formData.department === opt}
               onChange={handleChange}
-              className="mr-2"
+              className="mr-2 cursor-pointer"
             />
             <span className="text-sm">{opt}</span>
           </label>
@@ -1030,15 +1031,15 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
       <div>
         <label className="block text-gray-700 text-sm mb-2">วันที่แต่งตั้งตำแหน่งปัจจุบัน</label>
-        <input type="date" name="positionAppointedDate" value={formData.positionAppointedDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+        <input type="date" name="positionAppointedDate" value={formData.positionAppointedDate} onChange={handleChange} onClick={(e) => e.target.showPicker?.()} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] cursor-pointer" />
       </div>
       <div>
         <label className="block text-gray-700 text-sm mb-2">วันที่แต่งตั้งวิทยฐานะปัจจุบัน</label>
-        <input type="date" name="academicLevelAppointedDate" value={formData.academicLevelAppointedDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+        <input type="date" name="academicLevelAppointedDate" value={formData.academicLevelAppointedDate} onChange={handleChange} onClick={(e) => e.target.showPicker?.()} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] cursor-pointer" />
       </div>
       <div>
         <label className="block text-gray-700 text-sm mb-2">วันที่รับราชการในตำแหน่ง/สถานศึกษาปัจจุบัน</label>
-        <input type="date" name="currentPositionSchoolDate" value={formData.currentPositionSchoolDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+        <input type="date" name="currentPositionSchoolDate" value={formData.currentPositionSchoolDate} onChange={handleChange} onClick={(e) => e.target.showPicker?.()} className="w-full px-3 py-2 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
       </div>
     </div>
 
@@ -1047,7 +1048,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
       <div className="flex gap-4 flex-wrap">
         {['การบริหารสถานศึกษา', 'การนิเทศการศึกษา', 'การสอน'].map(opt => (
           <label key={opt} className="flex items-center">
-            <input type="radio" name="careerTrack" value={opt} checked={formData.careerTrack === opt} onChange={handleChange} className="mr-2" />
+            <input type="radio" name="careerTrack" value={opt} checked={formData.careerTrack === opt} onChange={handleChange} className="mr-2 cursor-pointer" />
             <span className="text-sm">{opt}</span>
           </label>
         ))}
@@ -1059,7 +1060,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
       <div className="flex flex-col gap-2">
         {['ยังไม่เคยเข้ารับการพัฒนา', 'อยู่ระหว่างการปรับปรุงผลงาน', 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2570'].map(opt => (
           <label key={opt} className="flex items-center">
-            <input type="radio" name="developmentCase" value={opt} checked={formData.developmentCase === opt} onChange={handleChange} className="mr-2" />
+            <input type="radio" name="developmentCase" value={opt} checked={formData.developmentCase === opt} onChange={handleChange} className="mr-2 cursor-pointer" />
             <span className="text-sm">{opt}</span>
           </label>
         ))}
@@ -1068,7 +1069,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
       {formData.developmentCase === 'วุฒิบัตรการพัฒนาหมดอายุในปีงบประมาณ พ.ศ. 2570' && (
         <div className="mt-2 pl-6">
           <label className="block text-gray-700 text-sm mb-2">วันที่หมดอายุ</label>
-          <input type="date" name="developmentCaseCertDate" value={formData.developmentCaseCertDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
+          <input type="date" name="developmentCaseCertDate" value={formData.developmentCaseCertDate} onChange={handleChange} onClick={(e) => e.target.showPicker?.()} className="w-full px-3 py-2 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]" />
         </div>
       )}
     </div>
@@ -1175,8 +1176,9 @@ export const CustomQuestionFields = ({ course, formData, handleChange }) => {
                 name={name}
                 value={formData[name] || ''}
                 onChange={handleChange}
+                onClick={(e) => e.target.showPicker?.()}
                 required={q.required}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none cursor-pointer focus:ring-2 focus:ring-[#2d6e5e]"
               />
             )}
 
@@ -1191,7 +1193,7 @@ export const CustomQuestionFields = ({ course, formData, handleChange }) => {
                       checked={formData[name] === opt}
                       onChange={handleChange}
                       required={q.required}
-                      className="mr-2"
+                      className="mr-2 cursor-pointer"
                     />
                     <span className="text-sm">{opt}</span>
                   </label>

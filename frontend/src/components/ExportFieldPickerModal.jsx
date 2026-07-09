@@ -77,6 +77,7 @@ const ExportFieldPickerModal = ({ isOpen, course, onClose }) => {
                                             type="checkbox"
                                             checked={allSelected}
                                             onChange={() => toggleGroup(groupKeys)}
+                                            className="cursor-pointer"
                                         />
                                         {group}
                                     </label>
@@ -87,6 +88,7 @@ const ExportFieldPickerModal = ({ isOpen, course, onClose }) => {
                                                     type="checkbox"
                                                     checked={selected.includes(f.key)}
                                                     onChange={() => toggleField(f.key)}
+                                                    className="cursor-pointer"
                                                 />
                                                 {f.label}
                                             </label>
