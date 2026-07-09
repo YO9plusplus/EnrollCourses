@@ -142,7 +142,7 @@ export default function MyRegistrationPage() {
                                                             type="file"
                                                             accept=".jpg,.jpeg,.png"
                                                             onChange={e => setEvidenceFile(e.target.files[0] || null)}
-                                                            className="text-sm"
+                                                            className="text-sm cursor-pointer"
                                                         />
                                                         <div className="flex gap-2">
                                                             <button

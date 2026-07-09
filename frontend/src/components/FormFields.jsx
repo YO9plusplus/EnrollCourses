@@ -659,7 +659,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
                 name="trainingEvidence"
                 onChange={handleFileChange}
                 accept=".pdf,.jpg,.jpeg,.png"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                className="w-full px-3 py-2 cursor-pointer border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
               />
               {formData.trainingEvidence && (
                 <p className="text-xs text-green-600 mt-1">
@@ -689,7 +689,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
             onChange={handleFileChange}
             accept=".pdf,.jpg,.jpeg,.png"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+            className="w-full px-3 py-2 border cursor-pointer border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
           />
           {formData.supervisorConsent && (
             <p className="text-xs text-green-600 mt-1">
@@ -712,7 +712,7 @@ export const ScoutPreviousTrainingFields = ({ formData, handleChange }) => {
             onChange={handleFileChange}
             accept=".pdf,.jpg,.jpeg,.png"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+            className="w-full px-3 py-2 border cursor-pointer border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
           />
           {formData.medicalCertificate && (
             <p className="text-xs text-green-600 mt-1">
@@ -851,7 +851,7 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPos
                 name="trainingEvidence"
                 onChange={handleFileChange}
                 accept=".pdf,.jpg,.jpeg,.png"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+                className="w-full px-3 py-2 border cursor-pointer border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
               />
               {formData.trainingEvidence && (
                 <p className="text-xs text-green-600 mt-1">
@@ -880,7 +880,7 @@ export const RedCrossPreviousTrainingFields = ({ formData, handleChange, userPos
             onChange={handleFileChange}
             accept=".pdf,.jpg,.jpeg,.png"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+            className="w-full px-3 py-2 cursor-pointer border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
           />
           {formData.supervisorConsent && (
             <p className="text-xs text-green-600 mt-1">
@@ -1113,7 +1113,7 @@ export const AcademicPromotionFields = ({ formData, handleChange, user, course }
           })}
           accept=".pdf,.jpg,.jpeg,.png"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+          className="w-full px-3 cursor-pointer py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
       />
       {formData.applicationForm && (
           <p className="text-xs text-green-600 mt-1">✓ ไฟล์: {formData.applicationForm.name}</p>

@@ -265,7 +265,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
                             type="file"
                             accept="image/*"
                             onChange={e => setImageFile(e.target.files[0] || null)}
-                            className="w-full text-sm text-gray-500"
+                            className="w-full text-sm text-gray-500 cursor-pointer"
                             {...(!course && { required: true })}
                         />
                     </div>

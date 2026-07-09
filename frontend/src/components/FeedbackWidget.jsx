@@ -181,7 +181,7 @@ const FeedbackWidget = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e] resize-none"
                 />
                 <div className="flex items-center gap-2">
-                    <input type="file" accept="image/*,.pdf" onChange={e => setImageFile(e.target.files[0] || null)} className="text-xs flex-1" />
+                    <input type="file" accept="image/*,.pdf" onChange={e => setImageFile(e.target.files[0] || null)} className="text-xs flex-1 cursor-pointer" />
                     <button
                         type="submit"
                         disabled={sending || (!text.trim() && !imageFile)}
