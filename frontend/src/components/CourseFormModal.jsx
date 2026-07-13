@@ -10,7 +10,7 @@ const EMPTY_FORM = {
     fullDescription: '',
     status: 'open',
     capacity: '',
-    dates: [],
+    rounds: [],
 	formType: '',
 	subCourses: [],
 	grantsAcademicLevel: '',
@@ -23,15 +23,16 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 	const [imageFile, setImageFile] = useState(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState('');
-	const [dateRange, setDateRange] = useState({ start: '', end: ''});
+	const [roundRanges, setRoundRanges] = useState([]);
 
 	
 	useEffect(() => {
 		if (!isOpen) return;
 		if (course) {
-			const sortedDates = [...course.dates]
-				.map( d=> new Date(d).toISOString().slice(0, 10))
-				.sort();
+			const loadedRounds = (course.rounds || []).map(r => ({
+				roundNumber: r.roundNumber ?? '',
+				dates: [...r.dates].map(d => new Date(d).toISOString().slice(0, 10)).sort(),
+			}));
 
 			setForm({
 				title: course.title,
@@ -39,7 +40,7 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				fullDescription: course.fullDescription,
 				status: course.status,
 				capacity: course.capacity,
-				dates: sortedDates,
+				rounds: loadedRounds,
 				formType: course.formType || '',
 				subCourses: course.subCourses || [],
 				grantsAcademicLevel: course.grantsAcademicLevel || '',
@@ -47,15 +48,13 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 				customQuestions: course.customQuestions || [],
 			});
 
-			if (sortedDates.length > 0) {
-				setDateRange({
-					start: sortedDates[0],
-					end: sortedDates[sortedDates.length - 1]
-				});
-			}
+			setRoundRanges(loadedRounds.map(r => ({
+				start: r.dates[0] || '',
+				end: r.dates[r.dates.length - 1] || '',
+			})));
 		} else {
 			setForm(EMPTY_FORM);
-			setDateRange({ start: '', end: ''});
+			setRoundRanges([]);
 		}
 		setImageFile(null);
 		setError('');
@@ -83,15 +82,45 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 		}
 	}, [form.formType]);
 
-	const handleRangeChange = (range) => {
-		setDateRange(range);
-		if (range.start && range.end) {
-			setForm(p => ({ ...p, dates: generateDateRange(range.start, range.end) }));
-		} else if (range.start) {
-			setForm(p => ({ ...p, dates: [range.start]}));
-		} else {
-			setForm(p => ({ ...p, dates: [] }));
-		}
+	const addRound = () => {
+		const last = form.rounds[form.rounds.length - 1];
+		const suggestedNumber = last?.roundNumber ? last.roundNumber + 1 : "";
+
+		setForm(p => ({ ...p, rounds: [...p.rounds, { roundNumber: suggestedNumber, dates: [] }] }));
+		setRoundRanges(p => [...p, { start: '', end: '' }]);
+	};
+
+	const removeRound = (i) => {
+		setForm(p => ({ ...p, rounds: p.rounds.filter((_, idx) => idx !== i) }));
+		setRoundRanges(p => p.filter((_, idx) => idx !== i));
+	};
+
+	const updateRoundNumber = (i, val) => {
+		setForm(p => {
+			const updated = [...p.rounds];
+			updated[i] = { ...updated[i], roundNumber: val ? Number(val) : '' };
+			return { ...p, rounds: updated };
+		});
+	};
+
+	const handleRoundRangesChange = (i, range) => {
+		setRoundRanges(p => {
+			const updated = [...p];
+			updated[i] = range;
+			return updated;
+		});
+
+		const dates = (range.start && range.end)
+			? generateDateRange(range.start, range.end)
+			: range.start
+			? [range.start]
+			: [];
+
+		setForm(p => {
+			const updated = [...p.rounds];
+			updated[i] = { ...updated[i], dates };
+			return { ...p, rounds: updated }
+		});
 	};
 
 	const handleSubmit = async (e) => {
@@ -107,18 +136,17 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
 			data.append('status', form.status);
 			if(form.capacity !== '' && form.capacity !== null) data.append('capacity', form.capacity);
 
-			const datesToSend = (dateRange.start && dateRange.end)
-				? generateDateRange(dateRange.start, dateRange.end)
-				: dateRange.start
-				? [dateRange.start]
-				: [];
+			const roundsToSend = form.rounds
+				.filter(r => r.dates.length > 0)
+				.map(r => ({ roundNumber: r.roundNumber || null, dates: r.dates }));
 
-			if (datesToSend.length === 0) {
-				setError('กรุณาเลือกวันที่อบรม');
+			if (roundsToSend.length === 0) {
+				setError('กรุณาเพิ่มอย่างน้อย 1 รุ่น พร้อมวันที่อบรม');
 				setSubmitting(false);
 				return;
 			}
-			datesToSend.forEach(d => data.append('dates', d));
+
+			data.append('rounds', JSON.stringify(roundsToSend))
 
 			if (form.formType) data.append('formType', form.formType);
 			if (imageFile) data.append('image', imageFile);
@@ -271,23 +299,52 @@ const CourseFormModal = ({ isOpen, course, onClose, onSaved }) => {
                     </div>
 
                     {/* Dates */}
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-2">รุ่นการอบรม</label>
+						<div className="space-y-4">
+							{form.rounds.map((round, i) => (
+								<div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+									<div className="flex justify-between items-center">
+										<input
+											type="number"
+											placeholder="รุ่นที่ เช่น 15"
+											value={round.roundNumber}
+											onChange={e => updateRoundNumber(i, e.target.value)}
+											className="w-32 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6e5e]"
+										/>
+										<button type="button" onClick={() => removeRound(i)} className="text-red-500 hover:text-red-700 cursor-pointer text-sm">
+											ลบรุ่น
+										</button>
+									</div>
+
+									<DateRangePicker
+										dateRange={roundRanges[i] || { start: '', end: '' }}
+										onChange={(range) => handleRoundRangesChange(i, range)}
+										disabled={form.status === 'closed'}
+									/>
+
+									{round.dates.length > 0 && (
 										<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">ช่วงวันที่อบรม</label>
-						<DateRangePicker dateRange={dateRange} onChange={handleRangeChange} disabled={form.status === 'closed'} />
+											<p className="text-xs text-gray-500 mb-1">วันที่ทั้งหมด {round.dates.length} วัน</p>
+											<div className="flex flex-wrap gap-1">
+												{round.dates.map((d, di) => (
+													<span key={di} className="px-2 py-0.5 bg-[#2d6e5e]/10 text-[#2d6e5e] text-xs rounded-full">
+														{new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
+													</span>
+												))}
+											</div>
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+
+						<button type="button" onClick={addRound} className="mt-2 text-sm text-[#2d6e5e] hover:underline cursor-pointer">
+							+ เพิ่มรุ่น
+						</button>
+
 						{form.status === 'closed' && (
 							<p className="text-xs text-amber-600 mt-1">ปิดรับสมัครแล้ว ไม่สามารถแก้ไขวันที่ได้</p>
-						)}
-						{form.dates.length > 0 && (
-							<div className="mt-2">
-								<p className="text-xs text-gray-500 mb-1">วันที่ทั้งหมด {form.dates.length} วัน</p>
-								<div className="flex flex-wrap gap-1">
-									{form.dates.map((d, i) => (
-										<span key={i} className="px-2 py-0.5 bg-[#2d6e5e]/10 text-[#2d6e5e] text-xs rounded-full">
-											{new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
-										</span>
-									))}
-								</div>
-							</div>
 						)}
 					</div>
 

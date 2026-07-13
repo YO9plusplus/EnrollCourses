@@ -67,12 +67,18 @@ const AdminCoursePage = () => {
 		closed: 'ปิดรับสมัคร',
 	};
 
-	const formatDates = (dates) => {
-		if (!dates?.length) return '-';
-		if (dates.length === 1) 
-			return new Date(dates[0]).toLocaleDateString('th-TH', {day: 'numeric', month:'short', year:'numeric'})
-		return new Date(dates[0]).toLocaleDateString('th-TH', {day: 'numeric', month:'short', year:'numeric'}) + ' - ' + new Date(dates[dates.length-1]).toLocaleDateString('th-TH', {day: 'numeric', month:'short', year:'numeric'});
-	};
+	const formatRounds = (rounds) => {
+        if (!rounds?.length) return '-';
+        return rounds.map(r => {
+            const opts = { day: 'numeric', month: 'short', year: '2-digit' };
+            const first = new Date(r.dates[0]).toLocaleDateString('th-TH', opts);
+            const last = r.dates.length > 1
+                ? ' - ' + new Date(r.dates[r.dates.length - 1]).toLocaleDateString('th-TH', opts)
+                : '';
+            const label = r.roundNumber ? `รุ่น ${r.roundNumber}: ` : '';
+            return `${label}${first}${last}`;
+        }).join(' / ');
+    }
 
 	if (loading) {
 		return (
@@ -117,7 +123,7 @@ const AdminCoursePage = () => {
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-700">{formatDates(course.dates)}</td>
+                                <td className="px-6 py-4 text-sm text-gray-700">{formatRounds(course.rounds)}</td>
                                 <td className="px-6 py-4 text-sm">{STATUS_LABEL[course.status]}</td>
                                 <td className="px-6 py-4 text-sm">{course.enrolledCount} / {course.capacity ?? '∞'}</td>
                                 <td className="px-6 py-4">

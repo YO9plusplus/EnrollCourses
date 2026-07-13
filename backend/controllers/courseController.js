@@ -3,15 +3,12 @@ const { getEffectiveStatus } = require('../utils/courseStatus');
 
 exports.createCourse = async (req, res) => {
     try {
-        const rawDates = req.body.dates;
-        const dates = rawDates
-            ? (Array.isArray(rawDates) ? rawDates : [rawDates])
-            : [];
+        const rounds = req.body.rounds ? JSON.parse(req.body.rounds) : [];
 
         const courseData = new Course({
             title: req.body.title,
             image: req.file?.path || req.body.image,
-            dates,
+            rounds,
             location: req.body.location,
             fullDescription: req.body.fullDescription,
 			status: req.body.status || 'open',
@@ -35,7 +32,7 @@ exports.createCourse = async (req, res) => {
 exports.getAllCourses = async (req, res) => {
 	try {		
 		const { fields } = req.query;
-		const projection = fields === 'list' ? 'title image dates status formType' : '';
+		const projection = fields === 'list' ? 'title image rounds status formType' : '';
 		
 		const courses = await Course.find().select(projection).sort({ _id: -1 });
 
@@ -99,11 +96,6 @@ exports.updateCourse = async (req, res) => {
 	try {
 		const { id } = req.params;
 
-		const rawDates = req.body.dates;
-		const dates = rawDates
-			? (Array.isArray(rawDates) ? rawDates : [rawDates]).flat().filter(Boolean)
-			: undefined;
-
 		const updateData = {
 			title: req.body.title,
 			location: req.body.location,
@@ -113,11 +105,15 @@ exports.updateCourse = async (req, res) => {
 			capacity: req.body.capacity ? Number(req.body.capacity) : null,
 			grantsAcademicLevel: req.body.grantsAcademicLevel || null,
 		};
-		if (dates?.length) updateData.dates = dates;
+
+		if (req.body.rounds) {
+			updateData.rounds = JSON.parse(req.body.rounds);
+		}
+		
 		if (req.file?.path) {
 			updateData.image = req.file.path;
 		}
-
+		
 		if (req.body.subCourses) {
 			updateData.subCourses = JSON.parse(req.body.subCourses);
 		}
@@ -155,6 +151,7 @@ exports.updateCourse = async (req, res) => {
 			course
 		});
 	} catch(err) {
+		console.error(err);
 		res.status(500).json({
 			success: false,
 			message: 'Failed to update course',

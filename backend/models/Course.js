@@ -11,10 +11,10 @@ const courseSchema = new mongoose.Schema({
 		required: true,
 	},
 
-	dates: {
-		type: [Date],
-		required: true,
-	},
+	rounds: [{
+		roundNumber: { type: Number },
+		dates: { type: [Date], required: true }
+	}],
 
 	location: {
 		type: String,

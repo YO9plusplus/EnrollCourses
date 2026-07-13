@@ -15,9 +15,11 @@ const CourseCalendar = ({ courses }) => {
 		courses
 			.filter((course) => course.status !== 'closed')
 			.forEach((course) => {
-				(course.dates || []).forEach((rawDate) => {
-					const key = formatDateKey(rawDate);
-					(map[key] ||= []).push(course);
+				(course.rounds || []).forEach((round) => {
+					(round.dates || []).forEach((rawDate) => {
+						const key = formatDateKey(rawDate);
+						(map[key] ||= []).push({course, round});
+					});
 				});
 			});
 		return map;
@@ -77,20 +79,20 @@ const CourseCalendar = ({ courses }) => {
 				{/* layer บน: แถบยาวของแต่ละคอร์ส วาดทับกล่องวันที่ */}
 				{segments.map((seg) => {
 					const color = getCourseColor(seg.course._id);
+					const roundLabel = seg.round.roundNumber ? `รุ่นที่ ${seg.round.roundNumber}` : '';
+					const displayText = roundLabel ? `${seg.course.title} (${roundLabel})` : seg.course.title;
 					return (
 					<button
-						key={`${seg.course._id}-${seg.startCol}`}
+						key={`${seg.course._id}-${seg.round.roundNumber ?? seg.round.dates[0]}-${seg.startCol}`}
 						onClick={() => goToCourse(seg.course._id)}
-						title={seg.course.title} // เผื่อชื่อยาวเกิน bar จะโดน truncate ตัด
+						title={displayText}
 						style={{
-						// ช่วงคอลัมน์ที่ bar จะกิน: เริ่มที่ startCol+1 จบก่อน endCol+2
-						// (ตัวเลขหลัง / ใน CSS grid คือ "เส้นถัดจากคอลัมน์สุดท้าย" ไม่ใช่คอลัมน์สุดท้ายเอง)
 						gridColumn: `${seg.startCol + 1} / ${seg.endCol + 2}`,
-						gridRow: seg.lane + 2, // +2 เพราะแถว 1 ถูกจองให้เลขวันที่ไปแล้ว
+						gridRow: seg.lane + 2,
 						}}
 						className={`relative z-10 cursor-pointer min-w-0 truncate text-left text-[10px] px-1.5 mx-0.5 my-px rounded ${color.bg} ${color.text}`}
 					>
-						{seg.course.title}
+						{displayText}
 					</button>
 					);
 				})}

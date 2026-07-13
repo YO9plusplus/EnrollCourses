@@ -4,14 +4,14 @@ const CourseDetailCard = ({ course }) => {
   const LOCATION_NAME = "สถาบันพัฒนาข้าราชการครูและบุคลากรทางการศึกษากรุงเทพมหานคร";
   const GOOGLE_MAPS_URL = "https://maps.google.com/?q=869+ถนนลาดหญ้า+คลองสาน+Bangkok+Thailand+10600";
 
-  const formatDates = (dates) => {
-    if (!dates || dates.length == 0) return 'ยังไม่กำหนด';
-    return dates.map(d =>
-      new Date(d).toLocaleDateString('th-TH', {
-        day: 'numeric', month: 'short', year: 'numeric'
-      })
-    ).join(', ');
-  };
+  const formatDateRange = (dates) => {
+    if (!dates || dates.length === 0) return 'ยังไม่กำหนด';
+    const opts = { day: 'numeric', month: 'short', year: 'numeric' };
+    const first = new Date(dates[0]).toLocaleDateString('th-TH', opts);
+    if (dates.length === 1) return first;
+    const last = new Date(dates[dates.length - 1]).toLocaleDateString('th-TH', opts);
+    return `${first} - ${last}`;
+  }
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             {/* Course Image */}
@@ -32,13 +32,17 @@ const CourseDetailCard = ({ course }) => {
                     {/* Date */}
                     <div className="flex items-start">
                         <span className="font-semibold mr-2">📅 วันที่:</span>
-                        <span >{formatDates(course.dates)}</span>
-                    </div>
-
-                    {/* Location + Map */}
-                    <div className="flex items-start">
-                        <span className="font-semibold mr-2 whitespace-nowrap">📍 สถานที่:</span>
-                        <span>{course.location}</span>
+                        {course.rounds?.length > 0 ? (
+                            <div className="space-y-0.5">
+                                {course.rounds.map((r, i) => (
+                                    <div key={i}>
+                                        {r.roundNumber ? `รุ่นที่ ${r.roundNumber}: ` : ''}{formatDateRange(r.dates)}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <span>ยังไม่กำหนด</span>
+                        )}
                     </div>
 
                     {/* Map Card */}

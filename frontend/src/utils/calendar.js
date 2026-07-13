@@ -49,29 +49,32 @@ export function getCourseColor(courseId) {
 }
 
 export function buildWeekSegments(week, eventsByDate) {
-	const dayCourseIds = week.map(({ date }) => 
-		(eventsByDate[formatDateKey(date)] || []).map((c) => c._id)
+	const keyOf = ({ course, round }) => `${course._id}::${round.roundNumber ?? round.dates[0]}`;
+
+	const dayEntryKeys = week.map(({ date }) => 
+		(eventsByDate[formatDateKey(date)] || []).map(keyOf)
 	);
 
-	const courseById = {};
+	const entryByKey = {};
 	week.forEach(({ date }) => {
-		(eventsByDate[formatDateKey(date)] || []).forEach((c) => {
-			courseById[c._id] = c;
+		(eventsByDate[formatDateKey(date)] || []).forEach((entry) => {
+			entryByKey[keyOf(entry)] = entry;
 		});
 	});
 
 	const segments = [];
 
-	Object.keys(courseById).forEach((id) => {
+	Object.keys(entryByKey).forEach((key) => {
 		let start = null;
 		for (let col = 0; col <= 7; col++) {
-			const present = col < 7 && dayCourseIds[col].includes(id);
+			const present = col < 7 && dayEntryKeys[col].includes(key);
 			if (present && start == null) {
 				start = col;
 			}
 
 			if (!present && start !== null) {
-				segments.push({ course: courseById[id], startCol: start, endCol: col - 1 });
+				const { course, round } = entryByKey[key];
+				segments.push({ course, round, startCol: start, endCol: col - 1 });
 				start = null;
 			}
 		}
